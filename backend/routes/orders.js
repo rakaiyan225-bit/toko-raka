@@ -3,78 +3,9 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const Order = require('../models/Order');
 
-const fallbackOrders = [
-  {
-    _id: 'ord_1',
-    orderId: '#CLD10042',
-    customer: {
-      name: 'Ahmad Ramadhan',
-      email: 'ahmad.ramadhan@email.com',
-      phone: '0812-3456-7890',
-      address: 'Jl. Merdeka No. 10, Jakarta Pusat',
-    },
-    items: [
-      { product: { name: 'Hoodie Hitam Clover Club' }, quantity: 1, size: 'L', price: 199000 },
-    ],
-    totalAmount: 199000,
-    shippingCost: 15000,
-    paymentMethod: 'Transfer Bank',
-    status: 'Selesai',
-  },
-  {
-    _id: 'ord_2',
-    orderId: '#CLD10041',
-    customer: {
-      name: 'Siti Nurhaliza',
-      email: 'siti.nurhaliza@email.com',
-      phone: '0813-9876-5432',
-      address: 'Jl. Sudirman No. 25, Bandung',
-    },
-    items: [
-      { product: { name: 'Kaos Oversize Hitam Clover' }, quantity: 1, size: 'M', price: 89000 },
-    ],
-    totalAmount: 89000,
-    shippingCost: 15000,
-    paymentMethod: 'DANA',
-    status: 'Dikirim',
-  },
-  {
-    _id: 'ord_3',
-    orderId: '#CLD10040',
-    customer: {
-      name: 'Dimas Pratama',
-      email: 'dimas.pratama@email.com',
-      phone: '0814-2234-5566',
-      address: 'Jl. Gatot Subroto No. 15, Surabaya',
-    },
-    items: [
-      { product: { name: 'Kaos Putih Basic Ladslub' }, quantity: 1, size: 'L', price: 75000 },
-    ],
-    totalAmount: 75000,
-    shippingCost: 15000,
-    paymentMethod: 'GoPay',
-    status: 'Diproses',
-  },
-  {
-    _id: 'ord_4',
-    orderId: '#CLD10039',
-    customer: {
-      name: 'Rina Amelia',
-      email: 'rina.amelia@email.com',
-      phone: '0815-6677-8899',
-      address: 'Jl. Ahmad Yani No. 30, Semarang',
-    },
-    items: [
-      { product: { name: 'Hoodie Putih Clover Ladsclub' }, quantity: 1, size: 'M', price: 199000 },
-    ],
-    totalAmount: 199000,
-    shippingCost: 15000,
-    paymentMethod: 'ShopeePay',
-    status: 'Selesai',
-  },
-];
+const fallbackOrders = [];
 
-let inMemoryOrders = [...fallbackOrders];
+let inMemoryOrders = [];
 
 // GET / - List all orders
 router.get('/', async (req, res) => {

@@ -33,14 +33,14 @@ router.get('/stats', async (req, res) => {
     console.warn('[Dashboard Stats] Using fallback data:', error.message);
   }
 
-  // Fallback matching design screenshot (Image 3)
+  // Fallback data when DB is empty or disconnected
   res.json({
     success: true,
     data: {
-      totalSales: 12450000,
-      totalOrders: 342,
-      totalProducts: 48,
-      totalCustomers: 1250,
+      totalSales: 0,
+      totalOrders: 0,
+      totalProducts: 0,
+      totalCustomers: 0,
     },
   });
 });
@@ -85,18 +85,8 @@ router.get('/sales-chart', async (req, res) => {
     console.warn('[Dashboard Chart] Using fallback data:', error.message);
   }
 
-  // Fallback trend matching screenshot
-  const fallbackChart = [
-    { month: 'Jan', sales: 4200000 },
-    { month: 'Feb', sales: 5100000 },
-    { month: 'Mar', sales: 5400000 },
-    { month: 'Apr', sales: 6800000 },
-    { month: 'Mei', sales: 6200000 },
-    { month: 'Jun', sales: 7900000 },
-    { month: 'Jul', sales: 7400000 },
-    { month: 'Agu', sales: 9800000 },
-    { month: 'Sep', sales: 12450000 },
-  ];
+  // Fallback empty chart
+  const fallbackChart = months.map((month) => ({ month, sales: 0 }));
   res.json({ success: true, data: fallbackChart });
 });
 
@@ -115,39 +105,8 @@ router.get('/recent-orders', async (req, res) => {
     console.warn('[Recent Orders] Using fallback data:', error.message);
   }
 
-  // Fallback matching design screenshot (Image 3)
-  const defaultRecentOrders = [
-    {
-      orderId: '#CLD10042',
-      customer: { name: 'Ahmad Ramadhan' },
-      items: [{ product: { name: 'Hoodie Hitam Clover Club' } }],
-      totalAmount: 199000,
-      status: 'Selesai',
-    },
-    {
-      orderId: '#CLD10041',
-      customer: { name: 'Siti Nurhaliza' },
-      items: [{ product: { name: 'Kaos Oversize Hitam Clover' } }],
-      totalAmount: 89000,
-      status: 'Dikirim',
-    },
-    {
-      orderId: '#CLD10040',
-      customer: { name: 'Dimas Pratama' },
-      items: [{ product: { name: 'Kaos Putih Basic Ladslub' } }],
-      totalAmount: 75000,
-      status: 'Diproses',
-    },
-    {
-      orderId: '#CLD10039',
-      customer: { name: 'Rina Amelia' },
-      items: [{ product: { name: 'Hoodie Putih Clover Ladsclub' } }],
-      totalAmount: 199000,
-      status: 'Selesai',
-    },
-  ];
-
-  res.json({ success: true, data: defaultRecentOrders });
+  // Fallback empty orders
+  res.json({ success: true, data: [] });
 });
 
 module.exports = router;

@@ -141,42 +141,50 @@ const Orders = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredOrders.map((order, idx) => (
-                <tr key={order._id || idx}>
-                  <td className="fw-bold">{order.orderId}</td>
-                  <td>{order.customer?.name}</td>
-                  <td>{order.items?.[0]?.product?.name || order.items?.[0]?.name || 'Produk'}</td>
-                  <td>
-                    {order.showAmountPill || idx === 0 ? (
-                      <span className="price-pill-green">
-                        {formatPrice(order.totalAmount || 199000)} <span className="pill-info-icon">ⓘ</span>
-                      </span>
-                    ) : (
-                      <span className="fw-bold">{formatPrice(order.totalAmount)}</span>
-                    )}
-                  </td>
-                  <td>{renderStatusBadge(order)}</td>
-                  <td>
-                    <div className="order-actions-buttons">
-                      <button
-                        className="btn-action-outline edit-status-btn"
-                        onClick={() => {
-                          setStatusModalOrder(order);
-                          setNewStatus(order.status);
-                        }}
-                      >
-                        <span className="btn-icon">✏</span> Ubah Status
-                      </button>
-                      <button
-                        className="btn-action-outline detail-btn"
-                        onClick={() => setSelectedOrder(order)}
-                      >
-                        <span className="btn-icon">👁</span> Detail
-                      </button>
-                    </div>
+              {filteredOrders.length === 0 ? (
+                <tr>
+                  <td colSpan="6" style={{ textAlign: 'center', padding: '2.5rem', color: '#64748b' }}>
+                    Belum ada pesanan masuk.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                filteredOrders.map((order, idx) => (
+                  <tr key={order._id || idx}>
+                    <td className="fw-bold">{order.orderId}</td>
+                    <td>{order.customer?.name}</td>
+                    <td>{order.items?.[0]?.product?.name || order.items?.[0]?.name || 'Produk'}</td>
+                    <td>
+                      {order.showAmountPill || idx === 0 ? (
+                        <span className="price-pill-green">
+                          {formatPrice(order.totalAmount || 199000)} <span className="pill-info-icon">ⓘ</span>
+                        </span>
+                      ) : (
+                        <span className="fw-bold">{formatPrice(order.totalAmount)}</span>
+                      )}
+                    </td>
+                    <td>{renderStatusBadge(order)}</td>
+                    <td>
+                      <div className="order-actions-buttons">
+                        <button
+                          className="btn-action-outline edit-status-btn"
+                          onClick={() => {
+                            setStatusModalOrder(order);
+                            setNewStatus(order.status);
+                          }}
+                        >
+                          <span className="btn-icon">✏</span> Ubah Status
+                        </button>
+                        <button
+                          className="btn-action-outline detail-btn"
+                          onClick={() => setSelectedOrder(order)}
+                        >
+                          <span className="btn-icon">👁</span> Detail
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

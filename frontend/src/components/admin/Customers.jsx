@@ -163,46 +163,54 @@ const Customers = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredCustomers.map((cust) => (
-                <tr key={cust._id}>
-                  <td>
-                    <div className="customer-avatar-name-cell">
-                      <div
-                        className="customer-initials-badge"
-                        style={{ backgroundColor: cust.avatarBg }}
-                      >
-                        {cust.initials}
-                      </div>
-                      <span className="fw-semibold">{cust.name}</span>
-                    </div>
-                  </td>
-                  <td className="text-muted">{cust.email}</td>
-                  <td>{cust.phone}</td>
-                  <td className="text-center">{cust.totalOrders}</td>
-                  <td className="fw-semibold">{formatPrice(cust.totalSpent)}</td>
-                  <td>
-                    <span className="status-pill-aktif">
-                      {cust.status} •
-                    </span>
-                  </td>
-                  <td>
-                    <div className="customer-action-buttons">
-                      <button
-                        className="btn-action-outline-sm"
-                        onClick={() => setSelectedCustomer(cust)}
-                      >
-                        <span className="btn-icon">👁</span> Lihat
-                      </button>
-                      <button
-                        className="btn-action-outline-sm"
-                        onClick={() => setSelectedCustomer(cust)}
-                      >
-                        <span className="btn-icon">✏</span> Edit
-                      </button>
-                    </div>
+              {filteredCustomers.length === 0 ? (
+                <tr>
+                  <td colSpan="7" style={{ textAlign: 'center', padding: '2.5rem', color: '#64748b' }}>
+                    Belum ada pelanggan terdaftar.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                filteredCustomers.map((cust) => (
+                  <tr key={cust._id}>
+                    <td>
+                      <div className="customer-avatar-name-cell">
+                        <div
+                          className="customer-initials-badge"
+                          style={{ backgroundColor: cust.avatarBg }}
+                        >
+                          {cust.initials}
+                        </div>
+                        <span className="fw-semibold">{cust.name}</span>
+                      </div>
+                    </td>
+                    <td className="text-muted">{cust.email}</td>
+                    <td>{cust.phone}</td>
+                    <td className="text-center">{cust.totalOrders}</td>
+                    <td className="fw-semibold">{formatPrice(cust.totalSpent)}</td>
+                    <td>
+                      <span className="status-pill-aktif">
+                        {cust.status} •
+                      </span>
+                    </td>
+                    <td>
+                      <div className="customer-action-buttons">
+                        <button
+                          className="btn-action-outline-sm"
+                          onClick={() => setSelectedCustomer(cust)}
+                        >
+                          <span className="btn-icon">👁</span> Lihat
+                        </button>
+                        <button
+                          className="btn-action-outline-sm"
+                          onClick={() => setSelectedCustomer(cust)}
+                        >
+                          <span className="btn-icon">✏</span> Edit
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

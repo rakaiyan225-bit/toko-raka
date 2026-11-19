@@ -46,15 +46,25 @@ const Checkout = () => {
   const subtotal = items.reduce((sum, it) => sum + it.price * it.quantity, 0);
   const totalPayment = subtotal + shippingCost;
 
-  const firstItem = items[0] || defaultCheckoutItem;
+  const updateItemSize = (index, newSize) => {
+    const updated = [...items];
+    updated[index].size = newSize;
+    setItems(updated);
+    try {
+      localStorage.setItem('cart', JSON.stringify(updated));
+    } catch (e) {}
+  };
 
   const handleWhatsAppClick = () => {
-    const autoMessage = `Halo Min, saya mau konfirmasi pesanan ${firstItem.name}, bayar via ${selectedMethod}, total ${formatPrice(totalPayment)}.`;
+    const itemSummaries = items
+      .map((it) => `- ${it.name} (Ukuran: ${it.size || 'M'}, Qty: ${it.quantity})`)
+      .join('\n');
+    const autoMessage = `Halo Min, saya mau konfirmasi pesanan CLOVER LADSCLUB:\n\n${itemSummaries}\n\nTotal: ${formatPrice(totalPayment)}\nMetode Pembayaran: ${selectedMethod}\n\nMohon diproses ya Min, terima kasih! ☘️`;
     const waUrl = `https://wa.me/6281234567890?text=${encodeURIComponent(autoMessage)}`;
     window.open(waUrl, '_blank');
   };
 
-  const autoFilledText = `Halo Min, saya mau konfirmasi pesanan ${firstItem.name}, bayar via ${selectedMethod}, total ${formatPrice(totalPayment)}.`;
+  const autoFilledText = `Halo Min, saya mau konfirmasi pesanan CLOVER LADSCLUB:\n${items.map(it => `- ${it.name} [Ukuran: ${it.size || 'M'}, Qty: ${it.quantity}]`).join('\n')}\nTotal: ${formatPrice(totalPayment)} via ${selectedMethod}`;
 
   return (
     <div className="checkout-dark-theme-wrapper">
@@ -94,7 +104,31 @@ const Checkout = () => {
                 <div className="checkout-prod-info">
                   <h4>{item.name}</h4>
                   <p className="qty-text">x{item.quantity}</p>
-                  <p className="size-text">Ukuran: {item.size || 'M'}</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '6px' }}>
+                    <span style={{ fontSize: '12px', color: '#94a3b8' }}>Ukuran:</span>
+                    <div style={{ display: 'flex', gap: '4px' }}>
+                      {['S', 'M', 'L', 'XL', 'XXL'].map((sz) => (
+                        <button
+                          key={sz}
+                          type="button"
+                          onClick={() => updateItemSize(index, sz)}
+                          style={{
+                            padding: '2px 7px',
+                            fontSize: '11px',
+                            fontWeight: (item.size || 'M') === sz ? '700' : '500',
+                            borderRadius: '4px',
+                            border: (item.size || 'M') === sz ? '1.5px solid #22c55e' : '1px solid #475569',
+                            background: (item.size || 'M') === sz ? '#15803d' : '#1e293b',
+                            color: '#ffffff',
+                            cursor: 'pointer',
+                            transition: 'all 0.15s ease',
+                          }}
+                        >
+                          {sz}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
 
                 <div className="checkout-prod-prices">

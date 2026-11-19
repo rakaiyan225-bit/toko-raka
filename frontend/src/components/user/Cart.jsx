@@ -34,6 +34,12 @@ const Cart = () => {
     updateCart(newCart);
   };
 
+  const updateSize = (index, newSize) => {
+    const newCart = [...cartItems];
+    newCart[index].size = newSize;
+    updateCart(newCart);
+  };
+
   const removeItem = (index) => {
     const newCart = cartItems.filter((_, i) => i !== index);
     updateCart(newCart);
@@ -74,7 +80,31 @@ const Cart = () => {
 
               <div className="cart-item-info">
                 <h3 className="cart-item-name">{item.name}</h3>
-                <p className="cart-item-size">Ukuran: {item.size}</p>
+                <div className="cart-item-size-row" style={{ display: 'flex', alignItems: 'center', gap: '6px', margin: '6px 0' }}>
+                  <span style={{ fontSize: '12px', color: '#64748b', fontWeight: '500' }}>Ukuran:</span>
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    {['S', 'M', 'L', 'XL', 'XXL'].map((sz) => (
+                      <button
+                        key={sz}
+                        type="button"
+                        onClick={() => updateSize(index, sz)}
+                        style={{
+                          padding: '2px 8px',
+                          fontSize: '11px',
+                          fontWeight: (item.size || 'M') === sz ? '700' : '500',
+                          borderRadius: '4px',
+                          border: (item.size || 'M') === sz ? '1.5px solid #15803d' : '1px solid #cbd5e1',
+                          background: (item.size || 'M') === sz ? '#dcfce7' : '#ffffff',
+                          color: (item.size || 'M') === sz ? '#15803d' : '#475569',
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease',
+                        }}
+                      >
+                        {sz}
+                      </button>
+                    ))}
+                  </div>
+                </div>
                 <p className="cart-item-price">{formatPrice(item.price)}</p>
               </div>
 

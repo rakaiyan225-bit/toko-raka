@@ -266,26 +266,34 @@ const Dashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {recentOrders.map((order, idx) => (
-                <tr key={idx}>
-                  <td className="fw-semibold">{order.orderId}</td>
-                  <td>{order.customerName}</td>
-                  <td>{order.productName}</td>
-                  <td className="fw-bold">{formatPrice(order.total)}</td>
-                  <td>
-                    <div className="action-cell-flex">
-                      {getStatusBadge(order.status)}
-                      <button
-                        className="btn-eye-icon"
-                        title="Lihat Detail"
-                        onClick={() => navigate('/admin/pesanan')}
-                      >
-                        👁
-                      </button>
-                    </div>
+              {recentOrders.length === 0 ? (
+                <tr>
+                  <td colSpan="5" style={{ textAlign: 'center', padding: '2rem', color: '#64748b' }}>
+                    Belum ada pesanan terbaru.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                recentOrders.map((order, idx) => (
+                  <tr key={idx}>
+                    <td className="fw-semibold">{order.orderId}</td>
+                    <td>{order.customerName}</td>
+                    <td>{order.productName}</td>
+                    <td className="fw-bold">{formatPrice(order.total)}</td>
+                    <td>
+                      <div className="action-cell-flex">
+                        {getStatusBadge(order.status)}
+                        <button
+                          className="btn-eye-icon"
+                          title="Lihat Detail"
+                          onClick={() => navigate('/admin/pesanan')}
+                        >
+                          👁
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

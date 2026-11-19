@@ -3,46 +3,9 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const Customer = require('../models/Customer');
 
-const fallbackCustomers = [
-  {
-    _id: 'cust_1',
-    name: 'Ahmad Ramadhan',
-    email: 'ahmad.ramadhan@email.com',
-    phone: '0812-3456-7890',
-    totalOrders: 12,
-    totalSpent: 2450000,
-    status: 'Aktif',
-  },
-  {
-    _id: 'cust_2',
-    name: 'Siti Nurhaliza',
-    email: 'siti.nurhaliza@email.com',
-    phone: '0813-9876-5432',
-    totalOrders: 8,
-    totalSpent: 1820000,
-    status: 'Aktif',
-  },
-  {
-    _id: 'cust_3',
-    name: 'Dimas Pratama',
-    email: 'dimas.pratama@email.com',
-    phone: '0814-2234-5566',
-    totalOrders: 5,
-    totalSpent: 950000,
-    status: 'Aktif',
-  },
-  {
-    _id: 'cust_4',
-    name: 'Rina Amelia',
-    email: 'rina.amelia@email.com',
-    phone: '0815-6677-8899',
-    totalOrders: 15,
-    totalSpent: 3120000,
-    status: 'Aktif',
-  },
-];
+const fallbackCustomers = [];
 
-let inMemoryCustomers = [...fallbackCustomers];
+let inMemoryCustomers = [];
 
 // GET / - List all customers
 router.get('/', async (req, res) => {
