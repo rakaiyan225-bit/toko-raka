@@ -361,7 +361,7 @@ const Checkout = () => {
           </h3>
 
           <button className="btn-whatsapp-giant" onClick={handleWhatsAppClick}>
-            <span style={{ fontSize: '24px' }}>💬</span> LANJUT KE WHATSAPP ADMIN
+            <span style={{ fontSize: '24px' }}>💬</span> LANJUT KE WHATSAPP
           </button>
 
           <div className="wa-bubble-preview-box">
@@ -374,7 +374,7 @@ const Checkout = () => {
           <div className="checkout-note-footer">
             <span className="info-symbol">ⓘ</span>
             <div>
-              Catatan: Setelah klik, kamu akan diarahkan ke WhatsApp Admin resmi CLOVER LADSCLUB (<strong>0895-1378-5705</strong>) untuk verifikasi pesanan dan konfirmasi pembayaran.
+              Catatan: Setelah klik, kamu akan diarahkan ke WhatsApp Admin resmi CLOVER LADSCLUB untuk verifikasi pesanan dan konfirmasi pembayaran.
             </div>
           </div>
         </section>
