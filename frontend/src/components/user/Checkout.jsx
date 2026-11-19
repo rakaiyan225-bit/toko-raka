@@ -282,7 +282,7 @@ const Checkout = () => {
               <input
                 type="tel"
                 required
-                placeholder="Contoh: 081234567890"
+                placeholder="Contoh: 089513785705"
                 value={customerPhone}
                 onChange={(e) => setCustomerPhone(e.target.value)}
                 style={{
