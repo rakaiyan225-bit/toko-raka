@@ -150,7 +150,7 @@ const Checkout = () => {
       .map((it) => `- ${it.name} (Ukuran: ${it.size || 'M'}, Qty: ${it.quantity})`)
       .join('\n');
     const autoMessage = `Halo Min, saya mau konfirmasi pesanan CLOVER LADSCLUB:\n\n*ID Pesanan:* ${orderId}\n*Nama:* ${customerName.trim()}\n*No. HP:* ${customerPhone.trim()}\n*Alamat:* ${customerAddress.trim()}\n\n*Pesanan:*\n${itemSummaries}\n\n*Total Bayar:* ${formatPrice(totalPayment)}\n*Metode Pembayaran:* ${selectedMethod}\n\nMohon diproses ya Min, terima kasih! ☘️`;
-    const waUrl = `https://wa.me/6281234567890?text=${encodeURIComponent(autoMessage)}`;
+    const waUrl = `https://wa.me/6289513785705?text=${encodeURIComponent(autoMessage)}`;
 
     setIsSubmitting(false);
     window.open(waUrl, '_blank');
