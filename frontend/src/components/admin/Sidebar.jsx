@@ -2,10 +2,10 @@ import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 
 const menuItems = [
-  { icon: '⌂', label: 'Dashboard', path: '/admin' },
+  { icon: '⊞', label: 'Dashboard', path: '/admin' },
   { icon: '📦', label: 'Produk', path: '/admin/produk' },
   { icon: '📋', label: 'Pesanan', path: '/admin/pesanan' },
-  { icon: '👥', label: 'Pelanggan', path: '/admin/pelanggan' },
+  { icon: '👤', label: 'Pelanggan', path: '/admin/pelanggan' },
   { icon: '🏷', label: 'Promo', path: '/admin/promo' },
   { icon: '📊', label: 'Laporan', path: '/admin/laporan' },
 ];
@@ -15,7 +15,7 @@ const Sidebar = () => {
 
   return (
     <aside className="sidebar-dark-green">
-      {/* Brand Logo */}
+      {/* Brand Header */}
       <div className="sidebar-brand-header">
         <div className="sidebar-clover-badge">☘️</div>
         <div className="sidebar-brand-name">
@@ -43,18 +43,20 @@ const Sidebar = () => {
 
       {/* Admin Profile Footer */}
       <div className="sidebar-bottom-profile">
-        <div className="sidebar-avatar-circle">AC</div>
-        <div className="sidebar-user-text">
-          <h5>Admin CLOVER</h5>
-          <p>admin@clover.co.id</p>
+        <div className="profile-user-info-row">
+          <div className="sidebar-avatar-circle">👤</div>
+          <div className="sidebar-user-text">
+            <h5>Admin •</h5>
+            <p>admin@cloverladsclub.com</p>
+          </div>
+          <button
+            className="sidebar-logout-icon-btn"
+            title="Keluar ke Halaman User"
+            onClick={() => navigate('/')}
+          >
+            ↪
+          </button>
         </div>
-        <button
-          className="sidebar-logout-button"
-          title="Keluar ke Halaman User"
-          onClick={() => navigate('/')}
-        >
-          <span>🚪 Keluar</span>
-        </button>
       </div>
     </aside>
   );

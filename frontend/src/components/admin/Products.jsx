@@ -8,362 +8,387 @@ const formatPrice = (price) => {
 const defaultProducts = [
   {
     _id: '1',
-    name: 'Kaos Oversize Hitam Clover',
-    price: 89000,
-    category: 'Kaos',
-    stock: 150,
-    rating: 4.8,
-    sold: 1200,
+    name: 'Hoodie Hitam Clover Club',
+    category: 'Hoodie',
+    price: 199000,
+    stock: 50,
+    description: 'Hoodie hitam premium dengan desain eksklusif Clover Club. Bahan fleece tebal nyaman dipakai.',
     image: '',
-    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
-    description: 'Kaos oversize hitam premium dengan logo Clover.',
+    imageName: 'preview.jpg',
+    imageSize: '1.2MB',
+    isActive: true,
   },
   {
     _id: '2',
-    name: 'Kaos Putih Basic Ladsclub',
-    price: 75000,
+    name: 'Kaos Oversize Hitam Clover',
     category: 'Kaos',
-    stock: 200,
-    rating: 4.9,
-    sold: 980,
+    price: 89000,
+    stock: 120,
+    description: 'Kaos oversize hitam dengan logo Clover streetwear.',
     image: '',
-    sizes: ['S', 'M', 'L', 'XL'],
-    description: 'Kaos putih basic dengan desain minimalis Ladsclub.',
+    imageName: 'kaos-hitam.jpg',
+    imageSize: '950KB',
+    isActive: true,
   },
   {
     _id: '3',
-    name: 'Hoodie Hitam Clover Club',
-    price: 199000,
-    category: 'Hoodie',
-    stock: 80,
-    rating: 4.7,
-    sold: 2100,
+    name: 'Kaos Putih Basic Ladsclub',
+    category: 'Kaos',
+    price: 75000,
+    stock: 85,
+    description: 'Kaos basic putih bahan katun combed 24s.',
     image: '',
-    sizes: ['S', 'M', 'L', 'XL'],
-    description: 'Hoodie hitam dengan desain eksklusif Clover Club.',
+    imageName: 'kaos-putih.jpg',
+    imageSize: '820KB',
+    isActive: true,
   },
   {
     _id: '4',
     name: 'Hoodie Putih Clover Ladsclub',
+    category: 'Hoodie',
     price: 199000,
-    category: 'Hoodie',
-    stock: 65,
-    rating: 4.8,
-    sold: 1500,
+    stock: 45,
+    description: 'Hoodie putih dengan bordir clover hijau di dada.',
     image: '',
-    sizes: ['S', 'M', 'L', 'XL'],
-    description: 'Hoodie putih dengan branding Clover Ladsclub.',
-  },
-  {
-    _id: '5',
-    name: 'Hoodie Clover Black',
-    price: 289000,
-    category: 'Hoodie',
-    stock: 40,
-    rating: 4.9,
-    sold: 850,
-    image: '',
-    sizes: ['M', 'L', 'XL'],
-    description: 'Hoodie premium full hitam dengan embroidery Clover.',
-  },
-  {
-    _id: '6',
-    name: 'Jaket Bomber Clover',
-    price: 350000,
-    category: 'Jaket',
-    stock: 30,
-    rating: 4.6,
-    sold: 600,
-    image: '',
-    sizes: ['M', 'L', 'XL'],
-    description: 'Jaket bomber dengan bahan parasut premium.',
+    imageName: 'hoodie-putih.jpg',
+    imageSize: '1.1MB',
+    isActive: true,
   },
 ];
 
-const categories = ['Semua', 'Kaos', 'Hoodie', 'Jaket', 'Kemeja', 'T-Shirt', 'Celana', 'Aksesori'];
-
 const Products = () => {
+  const [viewMode, setViewMode] = useState('form'); // 'form' (Tambah Barang) or 'list' (Daftar Produk)
   const [products, setProducts] = useState(defaultProducts);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeCategory, setActiveCategory] = useState('Semua');
-  const [showModal, setShowModal] = useState(false);
-  const [editingProduct, setEditingProduct] = useState(null);
+
+  // Form State matching Image 4
   const [formData, setFormData] = useState({
-    name: '',
-    price: '',
-    category: 'Kaos',
-    stock: '',
-    description: '',
-    sizes: 'S, M, L, XL',
+    name: 'Hoodie Hitam Clover Club',
+    category: 'Hoodie',
+    price: '199000',
+    stock: '50',
+    description: 'Masukkan deskripsi produk...',
+    isActive: true,
+    imageName: 'preview.jpg',
+    imageSize: '1.2MB',
+    imagePreview: null,
   });
+
+  const [notification, setNotification] = useState('');
 
   useEffect(() => {
-    fetchProducts();
+    const fetchProds = async () => {
+      try {
+        const res = await axios.get('/api/products');
+        if (res.data && res.data.success && Array.isArray(res.data.data) && res.data.data.length > 0) {
+          setProducts(res.data.data);
+        }
+      } catch (e) {}
+    };
+    fetchProds();
   }, []);
 
-  const fetchProducts = async () => {
-    try {
-      const res = await axios.get('/api/products');
-      if (res.data && res.data.success && Array.isArray(res.data.data) && res.data.data.length > 0) {
-        setProducts(res.data.data);
-      }
-    } catch (e) {
-      // Fallback
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const sizeMB = (file.size / (1024 * 1024)).toFixed(1) + 'MB';
+      setFormData({
+        ...formData,
+        imageName: file.name,
+        imageSize: sizeMB,
+        imagePreview: URL.createObjectURL(file),
+      });
     }
   };
 
-  const openAddModal = () => {
-    setEditingProduct(null);
-    setFormData({
-      name: '',
-      price: '',
-      category: 'Kaos',
-      stock: '',
-      description: '',
-      sizes: 'S, M, L, XL',
-    });
-    setShowModal(true);
-  };
-
-  const openEditModal = (p) => {
-    setEditingProduct(p);
-    setFormData({
-      name: p.name,
-      price: p.price,
-      category: p.category,
-      stock: p.stock,
-      description: p.description || '',
-      sizes: Array.isArray(p.sizes) ? p.sizes.join(', ') : p.sizes || 'S, M, L, XL',
-    });
-    setShowModal(true);
-  };
-
-  const handleDelete = async (id) => {
-    if (!window.confirm('Apakah Anda yakin ingin menghapus produk ini?')) return;
-    try {
-      await axios.delete(`/api/products/${id}`);
-    } catch (e) {}
-    setProducts((prev) => prev.filter((p) => p._id !== id));
-  };
-
-  const handleSubmit = async (e) => {
+  const handleSaveProduct = async (e) => {
     e.preventDefault();
-    const payload = {
-      ...formData,
+    const newProduct = {
+      _id: 'prod_' + Date.now(),
+      name: formData.name,
+      category: formData.category,
       price: Number(formData.price),
       stock: Number(formData.stock),
-      sizes: formData.sizes.split(',').map((s) => s.trim()),
+      description: formData.description,
+      isActive: formData.isActive,
+      imageName: formData.imageName,
+      imageSize: formData.imageSize,
+      image: formData.imagePreview || '',
     };
 
-    if (editingProduct) {
-      try {
-        await axios.put(`/api/products/${editingProduct._id}`, payload);
-      } catch (e) {}
-      setProducts((prev) =>
-        prev.map((p) => (p._id === editingProduct._id ? { ...p, ...payload } : p))
-      );
-    } else {
-      const newP = {
-        _id: Date.now().toString(),
-        ...payload,
-        rating: 5.0,
-        sold: 0,
-        image: '',
-      };
-      try {
-        await axios.post('/api/products', payload);
-      } catch (e) {}
-      setProducts([newP, ...products]);
-    }
-    setShowModal(false);
+    try {
+      await axios.post('/api/products', {
+        name: formData.name,
+        category: formData.category,
+        price: Number(formData.price),
+        stock: Number(formData.stock),
+        description: formData.description,
+        isActive: formData.isActive,
+      });
+    } catch (err) {}
+
+    setProducts([newProduct, ...products]);
+    setNotification('Produk berhasil disimpan ke katalog!');
+    setTimeout(() => setNotification(''), 4000);
   };
 
-  const filtered = products.filter((p) => {
-    const matchCat = activeCategory === 'Semua' || p.category === activeCategory;
-    const matchSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchCat && matchSearch;
-  });
-
   return (
-    <div className="admin-page products-page">
-      {/* Top Header */}
-      <header className="admin-topbar">
-        <div className="topbar-title-group">
-          <h1 className="topbar-title">Produk</h1>
-          <span className="topbar-subtext">Total {products.length} produk</span>
+    <div className="admin-page tambah-barang-page">
+      {/* Top Header & Breadcrumb */}
+      <header className="admin-topbar-breadcrumb">
+        <h1 className="topbar-title">Tambah Barang</h1>
+        <div className="breadcrumb-links">
+          <button
+            type="button"
+            className={`breadcrumb-nav-tab ${viewMode === 'list' ? 'active' : ''}`}
+            onClick={() => setViewMode('list')}
+          >
+            Daftar Produk
+          </button>
+          <span className="breadcrumb-separator">/</span>
+          <button
+            type="button"
+            className={`breadcrumb-nav-tab ${viewMode === 'form' ? 'active' : ''}`}
+            onClick={() => setViewMode('form')}
+          >
+            Tambah Barang
+          </button>
         </div>
-
-        <div className="topbar-search">
-          <span className="search-icon">🔍</span>
-          <input
-            type="text"
-            placeholder="Cari nama produk..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-
-        <button className="btn-add-primary" onClick={openAddModal}>
-          + Tambah Produk
-        </button>
       </header>
 
-      {/* Category Pills */}
-      <div className="status-filter-pills mb-4">
-        {categories.map((cat) => (
-          <button
-            key={cat}
-            className={`filter-tab-pill ${activeCategory === cat ? 'active' : ''}`}
-            onClick={() => setActiveCategory(cat)}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
+      {notification && (
+        <div className="alert-success-banner">
+          ✓ {notification}
+        </div>
+      )}
 
-      {/* Products Grid */}
-      <section className="admin-product-cards-grid">
-        {filtered.map((prod) => (
-          <div key={prod._id} className="admin-product-item-card">
-            <div className="prod-card-thumb">
-              {prod.image ? (
-                <img
-                  src={prod.image.startsWith('http') ? prod.image : `http://localhost:5000${prod.image}`}
-                  alt={prod.name}
-                />
-              ) : (
-                <div className="thumb-placeholder-box">
-                  <span className="thumb-placeholder-icon">👕</span>
-                </div>
-              )}
-              <span className="prod-badge-category">{prod.category}</span>
-            </div>
-
-            <div className="prod-card-body">
-              <h4 className="prod-card-title">{prod.name}</h4>
-              <p className="prod-card-price">{formatPrice(prod.price)}</p>
-
-              <div className="prod-card-stats-row">
-                <span>Stok: <strong>{prod.stock || 50}</strong></span>
-                <span>Terjual: <strong>{prod.sold || 0}</strong></span>
-                <span>⭐ {prod.rating || 5.0}</span>
-              </div>
-
-              <div className="prod-card-actions">
-                <button
-                  className="btn-action-outline edit-btn"
-                  onClick={() => openEditModal(prod)}
-                >
-                  ✏ Edit
-                </button>
-                <button
-                  className="btn-action-outline delete-btn"
-                  onClick={() => handleDelete(prod._id)}
-                >
-                  🗑 Hapus
-                </button>
-              </div>
-            </div>
+      {viewMode === 'form' ? (
+        /* Form Tambah Barang Matching Image 4 */
+        <div className="tambah-barang-wrapper">
+          {/* Header Card */}
+          <div className="tambah-barang-header-card">
+            <h2>Tambah Barang</h2>
+            <p>Lengkapi informasi produk baru untuk ditambahkan ke katalog</p>
           </div>
-        ))}
-      </section>
 
-      {/* Modal Add / Edit Product */}
-      {showModal && (
-        <div className="modal-backdrop">
-          <div className="modal-box modal-lg">
-            <div className="modal-header">
-              <h3>{editingProduct ? 'Edit Produk' : 'Tambah Produk Baru'}</h3>
-              <button className="modal-close-btn" onClick={() => setShowModal(false)}>✕</button>
-            </div>
-            <form onSubmit={handleSubmit}>
-              <div className="modal-body">
-                <div className="form-group mb-3">
-                  <label className="form-label">Nama Produk</label>
+          <form onSubmit={handleSaveProduct} className="tambah-barang-form-grid">
+            {/* Left Column: Product Info */}
+            <div className="form-left-col">
+              <div className="form-group mb-4">
+                <label className="form-field-label">Nama Produk</label>
+                <input
+                  type="text"
+                  required
+                  className="form-input-box"
+                  placeholder="Nama produk..."
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                />
+              </div>
+
+              <div className="form-group mb-4">
+                <label className="form-field-label">Kategori</label>
+                <div className="select-dropdown-wrapper">
+                  <select
+                    className="form-select-box"
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  >
+                    <option value="Hoodie">Hoodie</option>
+                    <option value="Kaos">Kaos</option>
+                    <option value="Jaket">Jaket</option>
+                    <option value="Kemeja">Kemeja</option>
+                    <option value="T-Shirt">T-Shirt</option>
+                    <option value="Celana">Celana</option>
+                    <option value="Aksesori">Aksesori</option>
+                  </select>
+                  <span className="dropdown-arrow-icon">▼</span>
+                </div>
+              </div>
+
+              <div className="form-group mb-4">
+                <label className="form-field-label">Harga</label>
+                <div className="price-input-box-wrapper">
                   <input
                     type="text"
                     required
-                    className="form-control"
-                    placeholder="Contoh: Hoodie Clover Black"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="form-input-box price-input"
+                    value={
+                      formData.price.startsWith('Rp')
+                        ? formData.price
+                        : `Rp${Number(formData.price).toLocaleString('id-ID')}`
+                    }
+                    onChange={(e) => {
+                      const raw = e.target.value.replace(/[^0-9]/g, '');
+                      setFormData({ ...formData, price: raw });
+                    }}
                   />
-                </div>
-
-                <div className="form-row-2 mb-3">
-                  <div className="form-group">
-                    <label className="form-label">Harga (Rp)</label>
-                    <input
-                      type="number"
-                      required
-                      className="form-control"
-                      placeholder="199000"
-                      value={formData.price}
-                      onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Kategori</label>
-                    <select
-                      className="form-select"
-                      value={formData.category}
-                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    >
-                      <option value="Kaos">Kaos</option>
-                      <option value="Hoodie">Hoodie</option>
-                      <option value="Jaket">Jaket</option>
-                      <option value="Kemeja">Kemeja</option>
-                      <option value="T-Shirt">T-Shirt</option>
-                      <option value="Celana">Celana</option>
-                      <option value="Aksesori">Aksesori</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="form-row-2 mb-3">
-                  <div className="form-group">
-                    <label className="form-label">Stok</label>
-                    <input
-                      type="number"
-                      required
-                      className="form-control"
-                      placeholder="50"
-                      value={formData.stock}
-                      onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Ukuran (pisahkan dengan koma)</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="S, M, L, XL"
-                      value={formData.sizes}
-                      onChange={(e) => setFormData({ ...formData, sizes: e.target.value })}
-                    />
-                  </div>
-                </div>
-
-                <div className="form-group mb-3">
-                  <label className="form-label">Deskripsi</label>
-                  <textarea
-                    rows="3"
-                    className="form-control"
-                    placeholder="Deskripsi produk streetwear..."
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  />
+                  <span className="price-suffix-icon">🪙</span>
                 </div>
               </div>
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>
+
+              <div className="form-group mb-4">
+                <label className="form-field-label">Stok</label>
+                <input
+                  type="number"
+                  required
+                  className="form-input-box"
+                  placeholder="50"
+                  value={formData.stock}
+                  onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                />
+              </div>
+
+              <div className="form-group mb-4">
+                <label className="form-field-label">Deskripsi</label>
+                <textarea
+                  rows="4"
+                  className="form-textarea-box"
+                  placeholder="Masukkan deskripsi produk..."
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                />
+              </div>
+            </div>
+
+            {/* Right Column: Upload & Actions */}
+            <div className="form-right-col">
+              <label className="form-field-label">Upload Foto Produk</label>
+
+              {/* Dashed Upload Dropzone */}
+              <div className="photo-upload-dashed-box">
+                <div className="photo-preview-image-box">
+                  {formData.imagePreview ? (
+                    <img src={formData.imagePreview} alt="Preview" />
+                  ) : (
+                    <div className="default-hoodie-mock-illustration">
+                      <span className="hoodie-emoji">🧥</span>
+                      <span className="clover-emblem">☘️</span>
+                    </div>
+                  )}
+                </div>
+
+                <p className="photo-filename-label">
+                  {formData.imageName} • {formData.imageSize}
+                </p>
+
+                <label className="btn-pilih-foto">
+                  + Pilih Foto
+                  <input
+                    type="file"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={handleFileChange}
+                  />
+                </label>
+              </div>
+
+              {/* Row: Produk Aktif with Toggle */}
+              <div className="produk-aktif-toggle-row">
+                <span className="toggle-label-text">Produk Aktif</span>
+                <label className="promo-toggle-switch">
+                  <input
+                    type="checkbox"
+                    checked={formData.isActive}
+                    onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                  />
+                  <span className="toggle-slider"></span>
+                </label>
+              </div>
+
+              {/* Bottom Buttons */}
+              <div className="tambah-barang-bottom-actions">
+                <button
+                  type="button"
+                  className="btn-batal-outline"
+                  onClick={() => setViewMode('list')}
+                >
                   Batal
                 </button>
-                <button type="submit" className="btn btn-primary">
-                  {editingProduct ? 'Perbarui Produk' : 'Simpan Produk'}
+                <button type="submit" className="btn-simpan-produk">
+                  <span className="save-icon">💾</span> Simpan Produk
                 </button>
               </div>
-            </form>
+            </div>
+          </form>
+        </div>
+      ) : (
+        /* List Mode: Daftar Katalog Produk */
+        <div className="content-card">
+          <div className="admin-card-header">
+            <h3>Daftar Produk ({products.length})</h3>
+            <button
+              className="btn-add-primary"
+              onClick={() => setViewMode('form')}
+            >
+              + Tambah Barang Baru
+            </button>
+          </div>
+
+          <div className="table-responsive">
+            <table className="admin-custom-table">
+              <thead>
+                <tr>
+                  <th>Produk</th>
+                  <th>Kategori</th>
+                  <th>Harga</th>
+                  <th>Stok</th>
+                  <th>Status</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {products.map((p) => (
+                  <tr key={p._id}>
+                    <td>
+                      <div className="customer-avatar-name-cell">
+                        <div className="product-table-thumb">
+                          {p.image ? (
+                            <img src={p.image} alt={p.name} />
+                          ) : (
+                            <span>🧥</span>
+                          )}
+                        </div>
+                        <div>
+                          <div className="fw-semibold">{p.name}</div>
+                          <div className="text-muted" style={{ fontSize: '12px' }}>{p.description?.substring(0, 40)}...</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td><span className="category-tag-pill">{p.category}</span></td>
+                    <td className="fw-bold text-green">{formatPrice(p.price)}</td>
+                    <td>{p.stock} pcs</td>
+                    <td>
+                      <span className={p.isActive ? 'status-pill-aktif' : 'status-badge status-dibatalkan'}>
+                        {p.isActive ? 'Aktif •' : 'Nonaktif'}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="customer-action-buttons">
+                        <button
+                          className="btn-action-outline-sm"
+                          onClick={() => {
+                            setFormData({
+                              name: p.name,
+                              category: p.category,
+                              price: String(p.price),
+                              stock: String(p.stock),
+                              description: p.description || '',
+                              isActive: p.isActive !== false,
+                              imageName: p.imageName || 'preview.jpg',
+                              imageSize: p.imageSize || '1.2MB',
+                              imagePreview: p.image || null,
+                            });
+                            setViewMode('form');
+                          }}
+                        >
+                          ✏ Edit
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       )}
