@@ -10,7 +10,7 @@ const hardcodedProducts = [
     category: 'Kaos',
     rating: 4.8,
     sold: '1.2rb',
-    image: '',
+    image: '/assets/prod-1.jpg',
     color: '#18181b',
     type: 'tshirt',
   },
@@ -21,7 +21,7 @@ const hardcodedProducts = [
     category: 'Kaos',
     rating: 4.9,
     sold: '980',
-    image: '',
+    image: '/assets/prod-2.jpg',
     color: '#ffffff',
     type: 'tshirt',
   },
@@ -32,7 +32,7 @@ const hardcodedProducts = [
     category: 'Hoodie',
     rating: 4.7,
     sold: '2.1rb',
-    image: '',
+    image: '/assets/prod-3.jpg',
     color: '#18181b',
     type: 'hoodie',
   },
@@ -43,7 +43,7 @@ const hardcodedProducts = [
     category: 'Hoodie',
     rating: 4.8,
     sold: '1.5rb',
-    image: '',
+    image: '/assets/prod-4.jpg',
     color: '#ffffff',
     type: 'hoodie',
   },
@@ -126,43 +126,50 @@ const Home = () => {
 
   return (
     <div className="home-page">
-      {/* Hero Banner Section - Gambar 1 */}
-      <section className="hero-banner-section">
-        <div className="hero-banner-container">
-          <img
-            src="/assets/hero-banner.jpg"
-            alt="PROMO 9.9 FLASH SALE - CLOVER LADSCLUB"
-            className="hero-banner-img"
-          />
-        </div>
-      </section>
+      {/* Promo Banner with Image 2 (Graffiti Artwork) as Background */}
+      <section className="promo-banner-section">
+        <div className="promo-banner-container">
+          <div className="user-promo-banner">
+            {/* Orange Corner Tag: PROMO 50% OFF */}
+            <div className="promo-top-badge">
+              <span className="badge-promo-text">PROMO</span>
+              <span className="badge-discount-text">50% OFF</span>
+            </div>
 
-      {/* Kategori Filter Bar */}
-      <div className="home-categories-container">
-        <div className="home-categories-wrapper">
-          <span className="home-cat-label">Kategori:</span>
-          <div className="home-categories-chips">
-            <button
-              type="button"
-              className={`home-cat-chip ${!activeCategory ? 'active' : ''}`}
-              onClick={() => setActiveCategory('')}
-            >
-              Semua
-            </button>
-            {categories.map((cat) => (
-              <button
-                key={cat.name}
-                type="button"
-                className={`home-cat-chip ${activeCategory === cat.name ? 'active' : ''}`}
-                onClick={() => setActiveCategory(activeCategory === cat.name ? '' : cat.name)}
-              >
-                <span className="chip-icon">{cat.icon}</span>
-                <span>{cat.name}</span>
-              </button>
-            ))}
+            {/* Left Content */}
+            <div className="promo-left-details">
+              <h1 className="promo-main-title">
+                PROMO 9.9<br />
+                FLASH SALE
+              </h1>
+              <p className="promo-tagline">Diskon hingga 50% + Gratis Ongkir!</p>
+              <p className="promo-schedule">Hanya 9–11 Sept</p>
+              <a href="#produk-rekomendasi" className="btn-promo-buy-now">
+                BELI SEKARANG
+              </a>
+            </div>
+
+            {/* Floating Kategori Card on the Right */}
+            <div className="banner-kategori-card">
+              <h3 className="kategori-card-heading">Kategori</h3>
+              <div className="kategori-boxes-row">
+                {categories.map((cat) => (
+                  <button
+                    key={cat.name}
+                    type="button"
+                    className={`kategori-box-btn ${activeCategory === cat.name ? 'active' : ''}`}
+                    onClick={() => setActiveCategory(activeCategory === cat.name ? '' : cat.name)}
+                    title={`Filter ${cat.name}`}
+                  >
+                    <span className="kategori-box-icon">{cat.icon}</span>
+                    <span className="kategori-box-label">{cat.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Produk Rekomendasi Section */}
       <section className="products-section" id="produk-rekomendasi">
@@ -183,39 +190,16 @@ const Home = () => {
             <div key={product._id} className="product-card">
               <Link to={`/product/${product._id}`} className="product-image-link">
                 <div className="product-image">
-                  {product.image ? (
-                    <img
-                      src={
-                        product.image.startsWith('http')
+                  <img
+                    src={
+                      product.image
+                        ? product.image.startsWith('http') || product.image.startsWith('/')
                           ? product.image
                           : `http://localhost:5000${product.image}`
-                      }
-                      alt={product.name}
-                    />
-                  ) : (
-                    <div
-                      className="image-placeholder"
-                      style={{
-                        backgroundColor: product.name.includes('Hitam') ? '#1e293b' : '#f8fafc',
-                        color: product.name.includes('Hitam') ? '#f8fafc' : '#334155',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '6px',
-                        padding: '12px',
-                      }}
-                    >
-                      <span style={{ fontSize: '42px', marginBottom: '2px' }}>
-                        {product.name.includes('Hoodie') ? '🧥' : '👕'}
-                      </span>
-                      <img
-                        src="/assets/logo.jpg"
-                        alt="CLOVER LADS CLUB"
-                        style={{ width: '38px', height: '38px', borderRadius: '50%', objectFit: 'cover', boxShadow: '0 2px 6px rgba(0,0,0,0.2)' }}
-                      />
-                    </div>
-                  )}
+                        : '/assets/prod-1.jpg'
+                    }
+                    alt={product.name}
+                  />
                 </div>
               </Link>
 

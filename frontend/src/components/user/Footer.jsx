@@ -59,7 +59,7 @@ const Footer = () => {
       </div>
 
       <div className="footer-bottom">
-        <p>© 2026 CLOVER LADS CLUB. Hak Cipta Dilindungi.</p>
+        <p>© 2024 CLOVER LADSCLUB. Hak Cipta Dilindungi.</p>
       </div>
     </footer>
   );
