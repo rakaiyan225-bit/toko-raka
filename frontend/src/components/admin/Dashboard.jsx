@@ -7,53 +7,24 @@ const formatPrice = (price) => {
 };
 
 const defaultStats = {
-  totalSales: 12450000,
-  totalOrders: 342,
-  totalProducts: 48,
-  totalCustomers: 1250,
+  totalSales: 0,
+  totalOrders: 0,
+  totalProducts: 0,
+  totalCustomers: 0,
 };
 
-const defaultRecentOrders = [
-  {
-    orderId: '#CLD10042',
-    customerName: 'Ahmad Ramadhan',
-    productName: 'Hoodie Hitam Clover Club',
-    total: 199000,
-    status: 'Selesai',
-  },
-  {
-    orderId: '#CLD10041',
-    customerName: 'Siti Nurhaliza',
-    productName: 'Kaos Oversize Hitam Clover',
-    total: 89000,
-    status: 'Dikirim',
-  },
-  {
-    orderId: '#CLD10040',
-    customerName: 'Dimas Pratama',
-    productName: 'Kaos Putih Basic Ladslub',
-    total: 75000,
-    status: 'Diproses',
-  },
-  {
-    orderId: '#CLD10039',
-    customerName: 'Rina Amelia',
-    productName: 'Hoodie Putih Clover Ladsclub',
-    total: 199000,
-    status: 'Selesai',
-  },
-];
+const defaultRecentOrders = [];
 
 const chartPoints = [
-  { month: 'Jan', value: 30 },
-  { month: 'Feb', value: 45 },
-  { month: 'Mar', value: 42 },
-  { month: 'Apr', value: 58 },
-  { month: 'Mei', value: 50 },
-  { month: 'Jun', value: 65 },
-  { month: 'Jul', value: 55 },
-  { month: 'Agu', value: 72 },
-  { month: 'Sep', value: 88 },
+  { month: 'Jan', value: 0 },
+  { month: 'Feb', value: 0 },
+  { month: 'Mar', value: 0 },
+  { month: 'Apr', value: 0 },
+  { month: 'Mei', value: 0 },
+  { month: 'Jun', value: 0 },
+  { month: 'Jul', value: 0 },
+  { month: 'Agu', value: 0 },
+  { month: 'Sep', value: 0 },
 ];
 
 const Dashboard = () => {
@@ -147,7 +118,7 @@ const Dashboard = () => {
           </div>
           <div className="stat-card-details">
             <p className="stat-label">Total Penjualan</p>
-            <h2 className="stat-value">{formatPrice(stats.totalSales || 12450000)}</h2>
+            <h2 className="stat-value">{formatPrice(stats.totalSales || 0)}</h2>
             <p className="stat-growth positive">↑ 12.5% dari bulan lalu</p>
           </div>
         </div>
@@ -158,7 +129,7 @@ const Dashboard = () => {
           </div>
           <div className="stat-card-details">
             <p className="stat-label">Pesanan</p>
-            <h2 className="stat-value">{(stats.totalOrders || 342).toLocaleString('id-ID')}</h2>
+            <h2 className="stat-value">{(stats.totalOrders || 0).toLocaleString('id-ID')}</h2>
             <p className="stat-growth positive">↑ 8.2% dari bulan lalu</p>
           </div>
         </div>
@@ -169,7 +140,7 @@ const Dashboard = () => {
           </div>
           <div className="stat-card-details">
             <p className="stat-label">Produk</p>
-            <h2 className="stat-value">{stats.totalProducts || 48}</h2>
+            <h2 className="stat-value">{stats.totalProducts || 0}</h2>
             <p className="stat-growth positive">↑ 3 produk baru</p>
           </div>
         </div>
@@ -180,7 +151,7 @@ const Dashboard = () => {
           </div>
           <div className="stat-card-details">
             <p className="stat-label">Pelanggan</p>
-            <h2 className="stat-value">{(stats.totalCustomers || 1250).toLocaleString('id-ID')}</h2>
+            <h2 className="stat-value">{(stats.totalCustomers || 0).toLocaleString('id-ID')}</h2>
             <p className="stat-growth positive">↑ 15 pelanggan baru</p>
           </div>
         </div>
@@ -193,7 +164,7 @@ const Dashboard = () => {
           <div className="card-header-simple">
             <div>
               <h3 className="card-title">Grafik Penjualan</h3>
-              <p className="card-subtitle-green">Penjualan September meningkat 12.5%</p>
+              <p className="card-subtitle-green">Belum ada data penjualan</p>
             </div>
           </div>
 
@@ -265,15 +236,15 @@ const Dashboard = () => {
           <div className="summary-badges-list">
             <div className="summary-badge-item">
               <span className="summary-tag badge-orange">Selesai</span>
-              <span className="summary-text">Pesanan Diproses: <strong>28</strong></span>
+              <span className="summary-text">Pesanan Diproses: <strong>0</strong></span>
             </div>
             <div className="summary-badge-item">
               <span className="summary-tag badge-blue">Pesanan</span>
-              <span className="summary-text">Pesanan Dikirim: <strong>120</strong></span>
+              <span className="summary-text">Pesanan Dikirim: <strong>0</strong></span>
             </div>
             <div className="summary-badge-item">
               <span className="summary-tag badge-green">Dikirim</span>
-              <span className="summary-text">Pesanan Selesai: <strong>194</strong></span>
+              <span className="summary-text">Pesanan Selesai: <strong>0</strong></span>
             </div>
           </div>
         </div>
@@ -320,7 +291,7 @@ const Dashboard = () => {
         </div>
 
         <div className="table-footer-pagination">
-          <span className="pagination-counter-text">Menampilkan 1-4 dari 342 pesanan</span>
+          <span className="pagination-counter-text">Menampilkan {recentOrders.length} dari {recentOrders.length} pesanan</span>
           <div className="pagination-page-numbers">
             <button className="page-num active">1</button>
             <button className="page-num">2</button>

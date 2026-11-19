@@ -5,52 +5,7 @@ const formatPrice = (price) => {
   return 'Rp' + price.toLocaleString('id-ID').replace(/,/g, '.');
 };
 
-const defaultCustomers = [
-  {
-    _id: '1',
-    initials: 'AR',
-    avatarBg: '#22c55e', // Green
-    name: 'Ahmad Ramadhan',
-    email: 'ahmad.ramadhan@email.com',
-    phone: '0812-3456-7890',
-    totalOrders: 12,
-    totalSpent: 2450000,
-    status: 'Aktif',
-  },
-  {
-    _id: '2',
-    initials: 'SN',
-    avatarBg: '#6366f1', // Indigo / Purple
-    name: 'Siti Nurhaliza',
-    email: 'siti.nurhaliza@email.com',
-    phone: '0813-9876-5432',
-    totalOrders: 8,
-    totalSpent: 1820000,
-    status: 'Aktif',
-  },
-  {
-    _id: '3',
-    initials: 'DP',
-    avatarBg: '#f97316', // Orange
-    name: 'Dimas Pratama',
-    email: 'dimas.pratama@email.com',
-    phone: '0814-2234-5566',
-    totalOrders: 5,
-    totalSpent: 950000,
-    status: 'Aktif',
-  },
-  {
-    _id: '4',
-    initials: 'RA',
-    avatarBg: '#f43f5e', // Rose / Red
-    name: 'Rina Amelia',
-    email: 'rina.amelia@email.com',
-    phone: '0815-6677-8899',
-    totalOrders: 15,
-    totalSpent: 3120000,
-    status: 'Aktif',
-  },
-];
+const defaultCustomers = [];
 
 const Customers = () => {
   const [customers, setCustomers] = useState(defaultCustomers);
@@ -136,7 +91,7 @@ const Customers = () => {
       <header className="admin-topbar">
         <div className="topbar-title-group">
           <h1 className="topbar-title">Pelanggan</h1>
-          <span className="topbar-subtext">Total 1.250 pelanggan</span>
+          <span className="topbar-subtext">Total {customers.length} pelanggan</span>
         </div>
 
         <div className="topbar-search">
@@ -162,8 +117,8 @@ const Customers = () => {
           </div>
           <div className="stat-card-details">
             <p className="stat-label">Pelanggan Baru</p>
-            <h2 className="stat-value">15</h2>
-            <p className="stat-growth positive">↗ +12% dari minggu lalu</p>
+            <h2 className="stat-value">0</h2>
+            <p className="stat-growth positive">↗ Belum ada data</p>
           </div>
         </div>
 
@@ -173,8 +128,8 @@ const Customers = () => {
           </div>
           <div className="stat-card-details">
             <p className="stat-label">Pelanggan Aktif</p>
-            <h2 className="stat-value">1.112</h2>
-            <p className="stat-subdetail">89% dari total pelanggan</p>
+            <h2 className="stat-value">0</h2>
+            <p className="stat-subdetail">0% dari total pelanggan</p>
           </div>
         </div>
 
@@ -184,8 +139,8 @@ const Customers = () => {
           </div>
           <div className="stat-card-details">
             <p className="stat-label">Total Transaksi</p>
-            <h2 className="stat-value">3.428</h2>
-            <p className="stat-growth positive">↗ +8% bulan ini</p>
+            <h2 className="stat-value">0</h2>
+            <p className="stat-growth positive">↗ Belum ada transaksi</p>
           </div>
         </div>
       </section>
@@ -254,7 +209,7 @@ const Customers = () => {
 
         <div className="table-footer-pagination">
           <span className="pagination-counter-text">
-            Menampilkan 1-4 dari 1.250 pelanggan
+            Menampilkan {filteredCustomers.length} dari {customers.length} pelanggan
           </span>
           <div className="pagination-page-numbers">
             <button className="page-nav-btn">Sebelumnya</button>

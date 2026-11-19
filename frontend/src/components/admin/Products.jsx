@@ -5,56 +5,7 @@ const formatPrice = (price) => {
   return 'Rp' + price.toLocaleString('id-ID').replace(/,/g, '.');
 };
 
-const defaultProducts = [
-  {
-    _id: '1',
-    name: 'Hoodie Hitam Clover Club',
-    category: 'Hoodie',
-    price: 199000,
-    stock: 50,
-    description: 'Hoodie hitam premium dengan desain eksklusif Clover Club. Bahan fleece tebal nyaman dipakai.',
-    image: '',
-    imageName: 'preview.jpg',
-    imageSize: '1.2MB',
-    isActive: true,
-  },
-  {
-    _id: '2',
-    name: 'Kaos Oversize Hitam Clover',
-    category: 'Kaos',
-    price: 89000,
-    stock: 120,
-    description: 'Kaos oversize hitam dengan logo Clover streetwear.',
-    image: '',
-    imageName: 'kaos-hitam.jpg',
-    imageSize: '950KB',
-    isActive: true,
-  },
-  {
-    _id: '3',
-    name: 'Kaos Putih Basic Ladsclub',
-    category: 'Kaos',
-    price: 75000,
-    stock: 85,
-    description: 'Kaos basic putih bahan katun combed 24s.',
-    image: '',
-    imageName: 'kaos-putih.jpg',
-    imageSize: '820KB',
-    isActive: true,
-  },
-  {
-    _id: '4',
-    name: 'Hoodie Putih Clover Ladsclub',
-    category: 'Hoodie',
-    price: 199000,
-    stock: 45,
-    description: 'Hoodie putih dengan bordir clover hijau di dada.',
-    image: '',
-    imageName: 'hoodie-putih.jpg',
-    imageSize: '1.1MB',
-    isActive: true,
-  },
-];
+const defaultProducts = [];
 
 const Products = () => {
   const [viewMode, setViewMode] = useState('form'); // 'form' (Tambah Barang) or 'list' (Daftar Produk)
@@ -62,14 +13,14 @@ const Products = () => {
 
   // Form State matching Image 4
   const [formData, setFormData] = useState({
-    name: 'Hoodie Hitam Clover Club',
+    name: '',
     category: 'Hoodie',
-    price: '199000',
-    stock: '50',
-    description: 'Masukkan deskripsi produk...',
+    price: '',
+    stock: '',
+    description: '',
     isActive: true,
-    imageName: 'preview.jpg',
-    imageSize: '1.2MB',
+    imageName: '',
+    imageSize: '',
     imagePreview: null,
   });
 

@@ -1,44 +1,6 @@
 import React, { useState } from 'react';
 
-const initialPromos = [
-  {
-    id: 1,
-    code: 'CLOVER10',
-    title: 'Kode CLOVER10',
-    discount: '10%',
-    description: 'Diskon 10% Semua Produk',
-    validUntil: 'Berlaku sampai 30 Sep',
-    isActive: true,
-  },
-  {
-    id: 2,
-    code: 'HEMAT20',
-    title: 'Kode HEMAT20',
-    discount: '20%',
-    description: 'Diskon 20% Hoodie',
-    validUntil: 'Berlaku sampai 15 Okt',
-    isActive: true,
-  },
-  {
-    id: 3,
-    code: 'HEMAT20_2',
-    title: 'Kode HEMAT20',
-    discount: '20%',
-    description: 'Diskon 20% Hoodie',
-    validUntil: 'Berlaku sampai 15 Okt',
-    isActive: true,
-  },
-  {
-    id: 4,
-    code: 'GRATISONGKIR',
-    title: 'Kode GRATISONGKIR',
-    discount: 'GRATIS',
-    description: 'Gratis Ongkir Min Rp150.000',
-    validUntil: 'Berakhir',
-    isActive: false,
-    isExpired: true,
-  },
-];
+const initialPromos = [];
 
 const Promo = () => {
   const [promos, setPromos] = useState(initialPromos);

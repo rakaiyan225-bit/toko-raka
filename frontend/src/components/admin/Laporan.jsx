@@ -5,46 +5,21 @@ const formatPrice = (price) => {
 };
 
 const barData = [
-  { month: 'Jan', height: 18, sales: 'Rp4.2M' },
-  { month: 'Hab', height: 25, sales: 'Rp5.1M' },
-  { month: 'Aab', height: 32, sales: 'Rp5.8M' },
-  { month: 'Sag', height: 38, sales: 'Rp6.4M' },
-  { month: 'Mun', height: 46, sales: 'Rp7.2M' },
-  { month: 'Dev', height: 55, sales: 'Rp8.0M' },
-  { month: 'Jad', height: 68, sales: 'Rp9.5M' },
-  { month: 'Am', height: 75, sales: 'Rp10.2M' },
-  { month: 'Hap', height: 82, sales: 'Rp11.0M' },
-  { month: 'Flev', height: 88, sales: 'Rp11.8M' },
-  { month: 'Sep', height: 96, sales: 'Rp12.4M' },
-  { month: 'Sep', height: 100, sales: 'Rp12.45M' },
+  { month: 'Jan', height: 0, sales: 'Rp0' },
+  { month: 'Feb', height: 0, sales: 'Rp0' },
+  { month: 'Mar', height: 0, sales: 'Rp0' },
+  { month: 'Apr', height: 0, sales: 'Rp0' },
+  { month: 'Mei', height: 0, sales: 'Rp0' },
+  { month: 'Jun', height: 0, sales: 'Rp0' },
+  { month: 'Jul', height: 0, sales: 'Rp0' },
+  { month: 'Agu', height: 0, sales: 'Rp0' },
+  { month: 'Sep', height: 0, sales: 'Rp0' },
+  { month: 'Okt', height: 0, sales: 'Rp0' },
+  { month: 'Nov', height: 0, sales: 'Rp0' },
+  { month: 'Des', height: 0, sales: 'Rp0' },
 ];
 
-const topProducts = [
-  {
-    id: 1,
-    name: 'Hoodie Hitam Clover Club',
-    category: 'Kategori: Hoodie',
-    sold: '120 terjual',
-    revenue: 5400000,
-    icon: '🧥',
-  },
-  {
-    id: 2,
-    name: 'Kaos Oversize Hitam',
-    category: 'Kategori: Kaos',
-    sold: '98 terjual',
-    revenue: 2940000,
-    icon: '👕',
-  },
-  {
-    id: 3,
-    name: 'Kaos Putih Basic',
-    category: 'Kategori: Kaos',
-    sold: '85 terjual',
-    revenue: 2125000,
-    icon: '👕',
-  },
-];
+const topProducts = [];
 
 const Laporan = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('September 2024');
@@ -104,8 +79,8 @@ const Laporan = () => {
           </div>
           <div className="laporan-stat-info">
             <p className="laporan-stat-label">Total Penjualan</p>
-            <h3 className="laporan-stat-val">Rp12.450.000</h3>
-            <p className="laporan-stat-subgreen">+12% dari Agustus</p>
+            <h3 className="laporan-stat-val">Rp0</h3>
+            <p className="laporan-stat-subgreen">Belum ada data</p>
           </div>
         </div>
 
@@ -116,8 +91,8 @@ const Laporan = () => {
           </div>
           <div className="laporan-stat-info">
             <p className="laporan-stat-label">Pesanan</p>
-            <h3 className="laporan-stat-val">342</h3>
-            <p className="laporan-stat-subgreen">+28 Pesanan</p>
+            <h3 className="laporan-stat-val">0</h3>
+            <p className="laporan-stat-subgreen">Belum ada pesanan</p>
           </div>
         </div>
 
@@ -128,8 +103,8 @@ const Laporan = () => {
           </div>
           <div className="laporan-stat-info">
             <p className="laporan-stat-label">Produk Terjual</p>
-            <h3 className="laporan-stat-val">512</h3>
-            <p className="laporan-stat-subgreen">+45 Produk</p>
+            <h3 className="laporan-stat-val">0</h3>
+            <p className="laporan-stat-subgreen">Belum ada produk terjual</p>
           </div>
         </div>
 
@@ -140,8 +115,8 @@ const Laporan = () => {
           </div>
           <div className="laporan-stat-info">
             <p className="laporan-stat-label">Rata-rata Pesanan</p>
-            <h3 className="laporan-stat-val">Rp150.000</h3>
-            <p className="laporan-stat-subgreen">+5% dari Agustus</p>
+            <h3 className="laporan-stat-val">Rp0</h3>
+            <p className="laporan-stat-subgreen">Belum ada data</p>
           </div>
         </div>
       </section>
@@ -169,7 +144,7 @@ const Laporan = () => {
           </div>
 
           <p className="laporan-chart-footnote">
-            Tren penjualan meningkat konsisten selama 9 bulan terakhir
+            Belum ada data penjualan
           </p>
         </div>
 

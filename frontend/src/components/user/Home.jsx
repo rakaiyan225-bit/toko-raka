@@ -2,52 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 
-const hardcodedProducts = [
-  {
-    _id: '1',
-    name: 'Kaos Oversize Hitam Clover',
-    price: 89000,
-    category: 'Kaos',
-    rating: 4.8,
-    sold: '1.2rb',
-    image: '/assets/prod-1.jpg',
-    color: '#18181b',
-    type: 'tshirt',
-  },
-  {
-    _id: '2',
-    name: 'Kaos Putih Basic Ladsclub',
-    price: 75000,
-    category: 'Kaos',
-    rating: 4.9,
-    sold: '980',
-    image: '/assets/prod-2.jpg',
-    color: '#ffffff',
-    type: 'tshirt',
-  },
-  {
-    _id: '3',
-    name: 'Hoodie Hitam Clover Club',
-    price: 199000,
-    category: 'Hoodie',
-    rating: 4.7,
-    sold: '2.1rb',
-    image: '/assets/prod-3.jpg',
-    color: '#18181b',
-    type: 'hoodie',
-  },
-  {
-    _id: '4',
-    name: 'Hoodie Putih Clover Ladsclub',
-    price: 199000,
-    category: 'Hoodie',
-    rating: 4.8,
-    sold: '1.5rb',
-    image: '/assets/prod-4.jpg',
-    color: '#ffffff',
-    type: 'hoodie',
-  },
-];
+const hardcodedProducts = [];
 
 const categories = [
   { name: 'Kaos', icon: '👕' },

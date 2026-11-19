@@ -41,37 +41,10 @@ const AuthModal = ({ isOpen, onClose, user, onAuthChange }) => {
         setErrorMsg(res.data.message || 'Login gagal.');
       }
     } catch (err) {
-      // Fallback local login if backend is not reachable
-      const fallbackUser = {
-        name: loginEmail.includes('@') ? loginEmail.split('@')[0] : 'Member Clover',
-        email: loginEmail,
-        phone: '0812-3456-7890',
-        role: 'user',
-      };
-      localStorage.setItem('user', JSON.stringify(fallbackUser));
-      onAuthChange(fallbackUser);
-      setSuccessMsg('Login berhasil! Selamat datang.');
-      setTimeout(() => {
-        onClose();
-      }, 1000);
+      setErrorMsg('Gagal terhubung ke server. Pastikan backend sudah berjalan.');
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleDemoLogin = () => {
-    const demoUser = {
-      name: 'Ahmad Ramadhan',
-      email: 'ahmad.ramadhan@email.com',
-      phone: '0812-3456-7890',
-      role: 'user',
-    };
-    localStorage.setItem('user', JSON.stringify(demoUser));
-    onAuthChange(demoUser);
-    setSuccessMsg('Login sebagai akun demo berhasil!');
-    setTimeout(() => {
-      onClose();
-    }, 800);
   };
 
   const handleRegister = async (e) => {
@@ -99,19 +72,7 @@ const AuthModal = ({ isOpen, onClose, user, onAuthChange }) => {
         setErrorMsg(res.data.message || 'Pendaftaran gagal.');
       }
     } catch (err) {
-      // Fallback local registration
-      const newUser = {
-        name: regName || 'Member Baru',
-        email: regEmail,
-        phone: regPhone,
-        role: 'user',
-      };
-      localStorage.setItem('user', JSON.stringify(newUser));
-      onAuthChange(newUser);
-      setSuccessMsg('Pendaftaran berhasil! Selamat datang di Clover Ladsclub.');
-      setTimeout(() => {
-        onClose();
-      }, 1000);
+      setErrorMsg('Gagal terhubung ke server. Pastikan backend sudah berjalan.');
     } finally {
       setLoading(false);
     }
@@ -235,17 +196,6 @@ const AuthModal = ({ isOpen, onClose, user, onAuthChange }) => {
                   {loading ? 'Memproses...' : 'Masuk Sekarang'}
                 </button>
 
-                <div className="auth-divider">
-                  <span>atau</span>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleDemoLogin}
-                  className="btn-auth-demo"
-                >
-                  ⚡ Masuk Cepat (Akun Demo)
-                </button>
               </form>
             ) : (
               <form onSubmit={handleRegister} className="auth-form-fields">
@@ -254,7 +204,7 @@ const AuthModal = ({ isOpen, onClose, user, onAuthChange }) => {
                   <input
                     type="text"
                     required
-                    placeholder="Contoh: Ahmad Ramadhan"
+                    placeholder="Nama lengkap Anda"
                     value={regName}
                     onChange={(e) => setRegName(e.target.value)}
                   />
