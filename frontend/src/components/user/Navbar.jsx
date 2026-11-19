@@ -1,8 +1,17 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import AuthModal from './AuthModal';
 
 const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('user') || 'null');
+    } catch {
+      return null;
+    }
+  });
   const navigate = useNavigate();
 
   const getCartCount = () => {
@@ -63,16 +72,28 @@ const Navbar = () => {
             )}
           </Link>
 
-          <Link
-            to="/admin"
-            className="nav-action-link"
-            title="Buka Admin Panel (/admin)"
+          <button
+            type="button"
+            className="nav-action-link nav-user-btn"
+            onClick={() => setIsAuthOpen(true)}
+            title={currentUser ? `Akun: ${currentUser.name}` : 'Login / Masuk Akun Pengguna'}
+            style={{ background: 'none', border: 'none', cursor: 'pointer' }}
           >
             <span className="nav-icon">👤</span>
-            <span className="nav-label">Saya</span>
-          </Link>
+            <span className="nav-label">
+              {currentUser ? currentUser.name.split(' ')[0] : 'Saya'}
+            </span>
+          </button>
         </div>
       </div>
+
+      {/* User Login & Profile Modal */}
+      <AuthModal
+        isOpen={isAuthOpen}
+        onClose={() => setIsAuthOpen(false)}
+        user={currentUser}
+        onAuthChange={setCurrentUser}
+      />
     </nav>
   );
 };
