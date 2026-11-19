@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const User = require('../models/User');
+const Customer = require('../models/Customer');
 
 // Fallback in-memory demo users
 const fallbackUsers = [
@@ -85,6 +86,24 @@ router.post('/register', async (req, res) => {
         password,
         role: 'user',
       });
+
+      // Otomatis masukkan ke daftar Customer agar muncul di Admin Pelanggan
+      try {
+        await Customer.findOneAndUpdate(
+          { email: email.toLowerCase() },
+          {
+            name,
+            email: email.toLowerCase(),
+            phone: phone || '-',
+            status: 'Aktif',
+            totalOrders: 0,
+            totalSpent: 0,
+          },
+          { upsert: true, new: true }
+        );
+      } catch (errCust) {
+        console.warn('Auto create customer error:', errCust.message);
+      }
 
       return res.status(201).json({
         success: true,

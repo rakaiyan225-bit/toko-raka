@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const Customer = require('../models/Customer');
+const User = require('../models/User');
 
 const fallbackCustomers = [];
 
@@ -11,7 +12,7 @@ let inMemoryCustomers = [];
 router.get('/', async (req, res) => {
   try {
     if (mongoose.connection.readyState === 1) {
-      const { search, page = 1, limit = 10 } = req.query;
+      const { search, page = 1, limit = 50 } = req.query;
       const query = {};
       if (search) {
         query.$or = [
@@ -19,21 +20,49 @@ router.get('/', async (req, res) => {
           { email: { $regex: search, $options: 'i' } },
         ];
       }
-      const skip = (parseInt(page) - 1) * parseInt(limit);
-      const total = await Customer.countDocuments(query);
-      const customers = await Customer.find(query)
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(parseInt(limit));
+      
+      const customers = await Customer.find(query).sort({ createdAt: -1 });
+
+      // Juga ambil user yang sudah register
+      const users = await User.find({ role: 'user' }).sort({ createdAt: -1 });
+      
+      const customerMap = new Map();
+      customers.forEach((c) => customerMap.set(c.email.toLowerCase(), c.toObject()));
+      
+      users.forEach((u) => {
+        const emailKey = u.email.toLowerCase();
+        if (!customerMap.has(emailKey)) {
+          customerMap.set(emailKey, {
+            _id: u._id,
+            name: u.name,
+            email: u.email,
+            phone: u.phone || '-',
+            totalOrders: 0,
+            totalSpent: 0,
+            status: 'Aktif',
+            createdAt: u.createdAt,
+          });
+        }
+      });
+
+      const merged = Array.from(customerMap.values());
+      const filtered = search
+        ? merged.filter(
+            (c) =>
+              c.name.toLowerCase().includes(search.toLowerCase()) ||
+              c.email.toLowerCase().includes(search.toLowerCase()) ||
+              (c.phone && c.phone.includes(search))
+          )
+        : merged;
 
       return res.json({
         success: true,
-        data: customers,
+        data: filtered,
         pagination: {
-          total,
+          total: filtered.length,
           page: parseInt(page),
           limit: parseInt(limit),
-          totalPages: Math.ceil(total / parseInt(limit)),
+          totalPages: Math.ceil(filtered.length / parseInt(limit)) || 1,
         },
       });
     }
@@ -118,6 +147,20 @@ router.put('/:id', async (req, res) => {
     res.status(404).json({ success: false, message: 'Pelanggan tidak ditemukan' });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
+  }
+});
+
+// DELETE /:id - Delete customer
+router.delete('/:id', async (req, res) => {
+  try {
+    if (mongoose.connection.readyState === 1) {
+      await Customer.findByIdAndDelete(req.params.id);
+      await User.findByIdAndDelete(req.params.id);
+    }
+    inMemoryCustomers = inMemoryCustomers.filter((c) => c._id !== req.params.id);
+    res.json({ success: true, message: 'Pelanggan berhasil dihapus' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 

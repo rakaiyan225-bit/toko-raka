@@ -57,6 +57,28 @@ const Customers = () => {
         });
       } catch (e) {}
 
+      // Ambil juga user yang terdaftar di akun pengguna
+      try {
+        const loggedInUser = JSON.parse(localStorage.getItem('user') || 'null');
+        if (loggedInUser && loggedInUser.email) {
+          const exists = localList.some(
+            (c) => c.email && c.email.toLowerCase() === loggedInUser.email.toLowerCase()
+          );
+          if (!exists) {
+            localList.unshift({
+              _id: loggedInUser.id || 'cust_' + Date.now(),
+              name: loggedInUser.name || loggedInUser.email.split('@')[0],
+              email: loggedInUser.email,
+              phone: loggedInUser.phone || '-',
+              totalOrders: 0,
+              totalSpent: 0,
+              status: 'Aktif',
+              createdAt: new Date().toISOString(),
+            });
+          }
+        }
+      } catch (e) {}
+
       const colors = ['#22c55e', '#6366f1', '#f97316', '#f43f5e', '#06b6d4', '#8b5cf6'];
       const map = new Map();
       remoteList.forEach((c) => map.set(c._id || c.email || c.name, c));

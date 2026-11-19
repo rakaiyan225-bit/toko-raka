@@ -33,6 +33,26 @@ const AuthModal = ({ isOpen, onClose, user, onAuthChange }) => {
       if (res.data && res.data.success) {
         localStorage.setItem('user', JSON.stringify(res.data.user));
         onAuthChange(res.data.user);
+
+        // Pastikan akun tercatat di daftar pelanggan
+        try {
+          const custs = JSON.parse(localStorage.getItem('clover_custom_customers') || '[]');
+          const email = res.data.user.email || loginEmail;
+          if (!custs.some((c) => c.email.toLowerCase() === email.toLowerCase())) {
+            custs.unshift({
+              _id: res.data.user.id || 'cust_' + Date.now(),
+              name: res.data.user.name || email.split('@')[0],
+              email: email,
+              phone: res.data.user.phone || '-',
+              totalOrders: 0,
+              totalSpent: 0,
+              status: 'Aktif',
+              createdAt: new Date().toISOString(),
+            });
+            localStorage.setItem('clover_custom_customers', JSON.stringify(custs));
+          }
+        } catch (e) {}
+
         setSuccessMsg('Login berhasil! Selamat datang kembali.');
         setTimeout(() => {
           onClose();
@@ -64,6 +84,35 @@ const AuthModal = ({ isOpen, onClose, user, onAuthChange }) => {
       if (res.data && res.data.success) {
         localStorage.setItem('user', JSON.stringify(res.data.user));
         onAuthChange(res.data.user);
+
+        // Otomatis masukkan ke daftar pelanggan admin
+        try {
+          const newCust = {
+            _id: res.data.user.id || 'cust_' + Date.now(),
+            name: res.data.user.name || regName.trim(),
+            email: res.data.user.email || regEmail.trim(),
+            phone: res.data.user.phone || regPhone || '-',
+            totalOrders: 0,
+            totalSpent: 0,
+            status: 'Aktif',
+            createdAt: new Date().toISOString(),
+          };
+
+          const custs = JSON.parse(localStorage.getItem('clover_custom_customers') || '[]');
+          if (!custs.some((c) => c.email.toLowerCase() === newCust.email.toLowerCase())) {
+            custs.unshift(newCust);
+            localStorage.setItem('clover_custom_customers', JSON.stringify(custs));
+          }
+
+          // Kirim juga ke endpoint customers
+          axios.post('/api/customers', {
+            name: newCust.name,
+            email: newCust.email,
+            phone: newCust.phone,
+            status: 'Aktif',
+          }).catch(() => {});
+        } catch (e) {}
+
         setSuccessMsg('Pendaftaran berhasil! Akun Anda telah aktif.');
         setTimeout(() => {
           onClose();
