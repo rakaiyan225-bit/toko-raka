@@ -32,7 +32,7 @@ const Footer = () => {
             <li><a href="#!">Pusat Bantuan</a></li>
             <li><a href="#!">Cara Belanja</a></li>
             <li><a href="#!">Pengembalian &amp; Refund</a></li>
-            <li><a href="#!">Kontak Kami</a></li>
+            <li><a href="https://wa.me/6289513785705?text=Halo%20Admin%20CLOVER%20LADSCLUB%2C%20saya%20ingin%20bertanya" target="_blank" rel="noopener noreferrer">Kontak Admin (WhatsApp)</a></li>
           </ul>
         </div>
 

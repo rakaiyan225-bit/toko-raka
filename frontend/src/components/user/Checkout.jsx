@@ -282,7 +282,7 @@ const Checkout = () => {
               <input
                 type="tel"
                 required
-                placeholder="Contoh: 089513785705"
+                placeholder="Contoh: 081234567890"
                 value={customerPhone}
                 onChange={(e) => setCustomerPhone(e.target.value)}
                 style={{
@@ -361,7 +361,7 @@ const Checkout = () => {
           </h3>
 
           <button className="btn-whatsapp-giant" onClick={handleWhatsAppClick}>
-            <span style={{ fontSize: '24px' }}>💬</span> LANJUT KE WHATSAPP
+            <span style={{ fontSize: '24px' }}>💬</span> LANJUT KE WHATSAPP ADMIN (0895-1378-5705)
           </button>
 
           <div className="wa-bubble-preview-box">
@@ -374,7 +374,7 @@ const Checkout = () => {
           <div className="checkout-note-footer">
             <span className="info-symbol">ⓘ</span>
             <div>
-              Catatan: Setelah klik, kamu akan diarahkan ke WhatsApp admin untuk kirim bukti pembayaran. Tidak perlu nomor telepon pribadi, transaksi aman &amp; terverifikasi.
+              Catatan: Setelah klik, kamu akan diarahkan ke WhatsApp Admin resmi CLOVER LADSCLUB (<strong>0895-1378-5705</strong>) untuk verifikasi pesanan dan konfirmasi pembayaran.
             </div>
           </div>
         </section>
