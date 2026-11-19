@@ -30,8 +30,11 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="navbar-container">
         <Link to="/" className="navbar-logo">
-          <span className="logo-icon">☘️</span>
-          <span className="logo-text">CLOVER LADSCLUB</span>
+          <img
+            src="/assets/logo-2.jpg"
+            alt="CLOVER LADS CLUB"
+            className="brand-logo-img"
+          />
         </Link>
 
         <form className="navbar-search" onSubmit={handleSearch}>
@@ -42,7 +45,9 @@ const Navbar = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="search-input"
           />
-          <button type="submit" className="search-btn" title="Cari">🔍</button>
+          <button type="submit" className="search-btn" title="Cari">
+            🔍
+          </button>
         </form>
 
         <div className="navbar-actions">
@@ -53,8 +58,12 @@ const Navbar = () => {
               <span className="cart-badge">{getCartCount()}</span>
             )}
           </Link>
-          
-          <Link to="/admin" className="nav-action-link" title="Buka Admin Panel (/admin)">
+
+          <Link
+            to="/admin"
+            className="nav-action-link"
+            title="Buka Admin Panel (/admin)"
+          >
             <span className="nav-icon">👤</span>
             <span className="nav-label">Saya</span>
           </Link>

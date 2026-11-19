@@ -5,7 +5,13 @@ const Footer = () => {
     <footer className="footer">
       <div className="footer-container">
         <div className="footer-column">
-          <h3 className="footer-title">☘️ CLOVER LADSCLUB</h3>
+          <div className="footer-logo-wrapper">
+            <img
+              src="/assets/logo-2.jpg"
+              alt="CLOVER LADS CLUB"
+              className="footer-logo-img"
+            />
+          </div>
           <p className="footer-desc">
             Fashion streetwear lokal untuk generasi aktif. Kualitas terbaik, gaya kasual.
           </p>
@@ -21,7 +27,7 @@ const Footer = () => {
           <ul className="footer-links">
             <li><a href="#!">Pusat Bantuan</a></li>
             <li><a href="#!">Cara Belanja</a></li>
-            <li><a href="#!">Pengembalian & Refund</a></li>
+            <li><a href="#!">Pengembalian &amp; Refund</a></li>
             <li><a href="#!">Kontak Kami</a></li>
           </ul>
         </div>
@@ -32,12 +38,12 @@ const Footer = () => {
             <li><a href="#!">Tentang Kami</a></li>
             <li><a href="#!">Karir</a></li>
             <li><a href="#!">Blog</a></li>
-            <li><a href="#!">Syarat & Ketentuan</a></li>
+            <li><a href="#!">Syarat &amp; Ketentuan</a></li>
           </ul>
         </div>
 
         <div className="footer-column">
-          <h3 className="footer-title">Pembayaran & Pengiriman</h3>
+          <h3 className="footer-title">Pembayaran &amp; Pengiriman</h3>
           <div className="payment-icons">
             <span className="payment-badge">VISA</span>
             <span className="payment-badge">Mastercard</span>
@@ -49,7 +55,7 @@ const Footer = () => {
       </div>
 
       <div className="footer-bottom">
-        <p>© 2024 CLOVER LADSCLUB. Hak Cipta Dilindungi.</p>
+        <p>© 2026 CLOVER LADS CLUB. Hak Cipta Dilindungi.</p>
       </div>
     </footer>
   );

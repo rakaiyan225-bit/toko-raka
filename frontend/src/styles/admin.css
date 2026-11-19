@@ -31,9 +31,31 @@
 .sidebar-brand-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 32px;
-  padding-left: 8px;
+  justify-content: center;
+  margin-bottom: 28px;
+  padding: 8px;
+}
+
+.sidebar-logo-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  text-decoration: none;
+}
+
+.sidebar-logo-img {
+  width: 100%;
+  max-width: 190px;
+  max-height: 65px;
+  object-fit: contain;
+  display: block;
+  border-radius: 6px;
+  transition: transform 0.2s ease;
+}
+
+.sidebar-logo-img:hover {
+  transform: scale(1.02);
 }
 
 .sidebar-clover-badge {

@@ -45,6 +45,14 @@
   color: #ffffff;
 }
 
+.brand-logo-img {
+  height: 48px;
+  max-width: 160px;
+  object-fit: contain;
+  display: block;
+  border-radius: 6px;
+}
+
 .logo-icon {
   font-size: 26px;
 }
@@ -128,7 +136,99 @@
   justify-content: center;
 }
 
-/* === HERO SECTION === */
+/* === HERO BANNER IMAGE 1 SECTION === */
+.hero-banner-section {
+  background: #f1f5f9;
+  padding: 24px 20px 10px 20px;
+}
+
+.hero-banner-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  background: #092c1a;
+  transition: transform 0.2s ease;
+}
+
+.hero-banner-container:hover {
+  transform: translateY(-2px);
+}
+
+.hero-banner-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+/* === HOME CATEGORIES FILTER BAR === */
+.home-categories-container {
+  max-width: 1200px;
+  margin: 14px auto 0 auto;
+  padding: 0 20px;
+}
+
+.home-categories-wrapper {
+  background: #ffffff;
+  padding: 12px 18px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.home-cat-label {
+  font-weight: 700;
+  font-size: 14px;
+  color: #0f3d26;
+  white-space: nowrap;
+}
+
+.home-categories-chips {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.home-cat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.home-cat-chip:hover {
+  border-color: #22c55e;
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+.home-cat-chip.active {
+  background: #0f3d26;
+  color: #ffffff;
+  border-color: #0f3d26;
+  box-shadow: 0 2px 8px rgba(15, 61, 38, 0.25);
+}
+
+.home-cat-chip .chip-icon {
+  font-size: 15px;
+}
+
+/* === HERO SECTION (LEGACY FALLBACK) === */
 .hero {
   background: linear-gradient(135deg, #092c1a 0%, #0f3d26 50%, #175e3a 100%);
   color: #ffffff;
@@ -797,7 +897,14 @@
   color: #ffffff;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+}
+
+.checkout-header-logo-img {
+  height: 28px;
+  max-width: 90px;
+  object-fit: contain;
+  display: block;
 }
 
 /* Section Headings */
@@ -1050,6 +1157,29 @@
   color: #94a3b8;
   margin-top: 32px;
   letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.checkout-footer-logo-img {
+  height: 22px;
+  max-width: 60px;
+  object-fit: contain;
+  display: inline-block;
+}
+
+.footer-logo-wrapper {
+  margin-bottom: 16px;
+}
+
+.footer-logo-img {
+  height: 52px;
+  max-width: 180px;
+  object-fit: contain;
+  display: block;
+  border-radius: 6px;
 }
 
 /* === FOOTER === */

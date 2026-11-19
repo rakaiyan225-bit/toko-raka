@@ -57,7 +57,11 @@ const Checkout = () => {
             ←
           </button>
           <div className="checkout-header-title">
-            <span>☘️</span>
+            <img
+              src="/assets/logo-2.jpg"
+              alt="CLOVER LADS CLUB"
+              className="checkout-header-logo-img"
+            />
             <span>CHECKOUT - BAYAR VIA WA</span>
           </div>
         </div>
@@ -160,7 +164,12 @@ const Checkout = () => {
 
         {/* Footer Brand */}
         <div className="checkout-trust-bottom">
-          CLOVER LADSCLUB • Aman • Cepat • Terpercaya ☘️
+          <img
+            src="/assets/logo-2.jpg"
+            alt="CLOVER LADS CLUB"
+            className="checkout-footer-logo-img"
+          />
+          <span>CLOVER LADSCLUB • Aman • Cepat • Terpercaya</span>
         </div>
       </div>
     </div>

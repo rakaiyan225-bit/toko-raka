@@ -126,47 +126,43 @@ const Home = () => {
 
   return (
     <div className="home-page">
-      {/* Hero Section */}
-      <section className="hero">
-        <div className="hero-container">
-          <div className="hero-promo-badge">
-            PROMO<br />50% OFF
-          </div>
-
-          <div className="hero-content">
-            <div className="hero-text">
-              <h1>
-                PROMO 9.9<br />
-                FLASH SALE
-              </h1>
-              <p className="hero-subtitle">Diskon hingga 50% + Gratis Ongkir!</p>
-              <p className="hero-date">Hanya 9–11 Sept</p>
-              <a href="#produk-rekomendasi" className="btn-hero">
-                BELI SEKARANG
-              </a>
-            </div>
-
-            <div className="hero-categories">
-              <div className="category-card">
-                <h3>Kategori</h3>
-                <div className="category-grid">
-                  {categories.map((cat) => (
-                    <button
-                      key={cat.name}
-                      type="button"
-                      className={`category-item ${activeCategory === cat.name ? 'active' : ''}`}
-                      onClick={() => setActiveCategory(activeCategory === cat.name ? '' : cat.name)}
-                    >
-                      <span className="category-icon">{cat.icon}</span>
-                      <span className="category-name">{cat.name}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
+      {/* Hero Banner Section - Gambar 1 */}
+      <section className="hero-banner-section">
+        <div className="hero-banner-container">
+          <img
+            src="/assets/hero-banner.jpg"
+            alt="PROMO 9.9 FLASH SALE - CLOVER LADSCLUB"
+            className="hero-banner-img"
+          />
         </div>
       </section>
+
+      {/* Kategori Filter Bar */}
+      <div className="home-categories-container">
+        <div className="home-categories-wrapper">
+          <span className="home-cat-label">Kategori:</span>
+          <div className="home-categories-chips">
+            <button
+              type="button"
+              className={`home-cat-chip ${!activeCategory ? 'active' : ''}`}
+              onClick={() => setActiveCategory('')}
+            >
+              Semua
+            </button>
+            {categories.map((cat) => (
+              <button
+                key={cat.name}
+                type="button"
+                className={`home-cat-chip ${activeCategory === cat.name ? 'active' : ''}`}
+                onClick={() => setActiveCategory(activeCategory === cat.name ? '' : cat.name)}
+              >
+                <span className="chip-icon">{cat.icon}</span>
+                <span>{cat.name}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {/* Produk Rekomendasi Section */}
       <section className="products-section" id="produk-rekomendasi">
@@ -206,14 +202,18 @@ const Home = () => {
                         flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
+                        gap: '6px',
+                        padding: '12px',
                       }}
                     >
-                      <span style={{ fontSize: '48px', marginBottom: '4px' }}>
+                      <span style={{ fontSize: '42px', marginBottom: '2px' }}>
                         {product.name.includes('Hoodie') ? '🧥' : '👕'}
                       </span>
-                      <span style={{ fontSize: '13px', fontWeight: '700', letterSpacing: '1px' }}>
-                        ☘️ CLOVER
-                      </span>
+                      <img
+                        src="/assets/logo-2.jpg"
+                        alt="CLOVER LADS CLUB"
+                        style={{ height: '24px', maxWidth: '85%', objectFit: 'contain' }}
+                      />
                     </div>
                   )}
                 </div>
