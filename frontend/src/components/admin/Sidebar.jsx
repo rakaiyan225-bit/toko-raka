@@ -10,14 +10,18 @@ const menuItems = [
   { icon: '📊', label: 'Laporan', path: '/admin/laporan' },
 ];
 
-const Sidebar = () => {
+const Sidebar = ({ onNavigate }) => {
   const navigate = useNavigate();
 
   return (
     <aside className="sidebar-dark-green">
       {/* Brand Header with Circular Embroidered Logo */}
       <div className="sidebar-brand-header">
-        <NavLink to="/admin" className="sidebar-brand-link">
+        <NavLink
+          to="/admin"
+          className="sidebar-brand-link"
+          onClick={() => onNavigate && onNavigate()}
+        >
           <img
             src="/assets/logo.jpg"
             alt="CLOVER LADS CLUB"
@@ -37,6 +41,7 @@ const Sidebar = () => {
             key={item.path}
             to={item.path}
             end={item.path === '/admin'}
+            onClick={() => onNavigate && onNavigate()}
             className={({ isActive }) =>
               `sidebar-nav-pill-item ${isActive ? 'active-pill' : ''}`
             }
