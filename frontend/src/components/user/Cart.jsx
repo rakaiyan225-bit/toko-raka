@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import AuthModal from './AuthModal';
 
 const formatPrice = (price) => {
   return 'Rp' + price.toLocaleString('id-ID').replace(/,/g, '.');
@@ -15,6 +16,14 @@ const getProductImage = (img) => {
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('user') || 'null');
+    } catch {
+      return null;
+    }
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -154,12 +163,33 @@ const Cart = () => {
           </div>
           <button
             className="btn btn-primary btn-block"
-            onClick={() => navigate('/checkout')}
+            onClick={() => {
+              const user = JSON.parse(localStorage.getItem('user') || 'null');
+              if (!user) {
+                alert('🔒 Silakan login atau daftar akun terlebih dahulu untuk melanjutkan checkout!');
+                setIsAuthOpen(true);
+                return;
+              }
+              navigate('/checkout');
+            }}
           >
             Lanjut ke Checkout
           </button>
         </div>
       </div>
+
+      <AuthModal
+        isOpen={isAuthOpen}
+        onClose={() => setIsAuthOpen(false)}
+        user={currentUser}
+        onAuthChange={(userData) => {
+          setCurrentUser(userData);
+          if (userData) {
+            setIsAuthOpen(false);
+            navigate('/checkout');
+          }
+        }}
+      />
     </div>
   );
 };

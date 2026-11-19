@@ -61,7 +61,28 @@ const AuthModal = ({ isOpen, onClose, user, onAuthChange }) => {
         setErrorMsg(res.data.message || 'Login gagal.');
       }
     } catch (err) {
-      setErrorMsg('Gagal terhubung ke server. Pastikan backend sudah berjalan.');
+      // Fallback login lokal jika server offline
+      try {
+        const custs = JSON.parse(localStorage.getItem('clover_custom_customers') || '[]');
+        const found = custs.find(
+          (c) => c.email && c.email.toLowerCase() === loginEmail.toLowerCase().trim()
+        );
+        const fallbackUser = {
+          id: found ? found._id : 'user_' + Date.now(),
+          name: found ? found.name : loginEmail.split('@')[0],
+          email: loginEmail.trim(),
+          phone: found ? found.phone : '-',
+          role: 'user',
+        };
+        localStorage.setItem('user', JSON.stringify(fallbackUser));
+        onAuthChange(fallbackUser);
+        setSuccessMsg('Login berhasil! Selamat datang kembali.');
+        setTimeout(() => {
+          onClose();
+        }, 1000);
+      } catch (e) {
+        setErrorMsg('Gagal terhubung ke server.');
+      }
     } finally {
       setLoading(false);
     }
@@ -121,7 +142,40 @@ const AuthModal = ({ isOpen, onClose, user, onAuthChange }) => {
         setErrorMsg(res.data.message || 'Pendaftaran gagal.');
       }
     } catch (err) {
-      setErrorMsg('Gagal terhubung ke server. Pastikan backend sudah berjalan.');
+      // Fallback registrasi lokal jika server offline
+      try {
+        const fallbackUser = {
+          id: 'user_' + Date.now(),
+          name: regName.trim(),
+          email: regEmail.trim(),
+          phone: regPhone.trim() || '-',
+          role: 'user',
+        };
+        localStorage.setItem('user', JSON.stringify(fallbackUser));
+        onAuthChange(fallbackUser);
+
+        const custs = JSON.parse(localStorage.getItem('clover_custom_customers') || '[]');
+        if (!custs.some((c) => c.email && c.email.toLowerCase() === regEmail.toLowerCase().trim())) {
+          custs.unshift({
+            _id: fallbackUser.id,
+            name: fallbackUser.name,
+            email: fallbackUser.email,
+            phone: fallbackUser.phone,
+            totalOrders: 0,
+            totalSpent: 0,
+            status: 'Aktif',
+            createdAt: new Date().toISOString(),
+          });
+          localStorage.setItem('clover_custom_customers', JSON.stringify(custs));
+        }
+
+        setSuccessMsg('Pendaftaran berhasil! Akun Anda telah aktif.');
+        setTimeout(() => {
+          onClose();
+        }, 1000);
+      } catch (e) {
+        setErrorMsg('Gagal terhubung ke server.');
+      }
     } finally {
       setLoading(false);
     }

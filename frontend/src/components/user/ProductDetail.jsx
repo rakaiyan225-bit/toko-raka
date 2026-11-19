@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import AuthModal from './AuthModal';
 
 const hardcodedProducts = [
   { _id: '1', name: 'Kaos Oversize Hitam Clover', price: 89000, category: 'Kaos', rating: 4.8, sold: 1200, image: '', description: 'Kaos oversize premium dengan bahan cotton combed 30s. Nyaman dipakai sehari-hari, cocok untuk gaya streetwear.', sizes: ['S', 'M', 'L', 'XL'] },
@@ -43,6 +44,14 @@ const ProductDetail = () => {
   const [selectedSize, setSelectedSize] = useState('M');
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('user') || 'null');
+    } catch {
+      return null;
+    }
+  });
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -98,7 +107,29 @@ const ProductDetail = () => {
   };
 
   const buyNow = () => {
-    addToCart();
+    if (!product) return;
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const existing = cart.find(item => item._id === product._id && item.size === selectedSize);
+    if (existing) {
+      existing.quantity += quantity;
+    } else {
+      cart.push({
+        _id: product._id,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+        size: selectedSize,
+        quantity: quantity,
+      });
+    }
+    localStorage.setItem('cart', JSON.stringify(cart));
+
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    if (!user) {
+      alert('🔒 Silakan login atau daftar akun terlebih dahulu untuk melanjutkan pembelian!');
+      setIsAuthOpen(true);
+      return;
+    }
     navigate('/checkout');
   };
 
@@ -178,6 +209,19 @@ const ProductDetail = () => {
           </div>
         </div>
       </div>
+
+      <AuthModal
+        isOpen={isAuthOpen}
+        onClose={() => setIsAuthOpen(false)}
+        user={currentUser}
+        onAuthChange={(userData) => {
+          setCurrentUser(userData);
+          if (userData) {
+            setIsAuthOpen(false);
+            navigate('/checkout');
+          }
+        }}
+      />
     </div>
   );
 };

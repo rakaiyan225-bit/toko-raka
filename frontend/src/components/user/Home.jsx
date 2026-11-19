@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
+import AuthModal from './AuthModal';
 
 const hardcodedProducts = [];
 
@@ -29,6 +30,14 @@ const formatPrice = (price) => {
 const Home = () => {
   const [products, setProducts] = useState(hardcodedProducts);
   const [activeCategory, setActiveCategory] = useState('');
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('user') || 'null');
+    } catch {
+      return null;
+    }
+  });
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -94,6 +103,13 @@ const Home = () => {
       },
     ];
     localStorage.setItem('cart', JSON.stringify(cart));
+
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    if (!user) {
+      alert('🔒 Silakan login atau daftar akun terlebih dahulu untuk melanjutkan pembelian!');
+      setIsAuthOpen(true);
+      return;
+    }
     navigate('/checkout');
   };
 
@@ -220,6 +236,19 @@ const Home = () => {
           )}
         </div>
       </section>
+
+      <AuthModal
+        isOpen={isAuthOpen}
+        onClose={() => setIsAuthOpen(false)}
+        user={currentUser}
+        onAuthChange={(userData) => {
+          setCurrentUser(userData);
+          if (userData) {
+            setIsAuthOpen(false);
+            navigate('/checkout');
+          }
+        }}
+      />
     </div>
   );
 };

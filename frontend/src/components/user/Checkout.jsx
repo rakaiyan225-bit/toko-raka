@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import AuthModal from './AuthModal';
 
 const formatPrice = (price) => {
   return 'Rp' + price.toLocaleString('id-ID').replace(/,/g, '.');
@@ -38,6 +39,14 @@ const Checkout = () => {
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerAddress, setCustomerAddress] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('user') || 'null');
+    } catch {
+      return null;
+    }
+  });
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -47,10 +56,22 @@ const Checkout = () => {
     }
     const loggedIn = JSON.parse(localStorage.getItem('user') || 'null');
     if (loggedIn) {
+      setCurrentUser(loggedIn);
       if (loggedIn.name) setCustomerName(loggedIn.name);
-      if (loggedIn.phone) setCustomerPhone(loggedIn.phone);
+      if (loggedIn.phone && loggedIn.phone !== '-') setCustomerPhone(loggedIn.phone);
+    } else {
+      // Buka modal login jika belum login
+      setIsAuthOpen(true);
     }
   }, []);
+
+  const handleAuthChange = (userData) => {
+    setCurrentUser(userData);
+    if (userData) {
+      if (userData.name) setCustomerName(userData.name);
+      if (userData.phone && userData.phone !== '-') setCustomerPhone(userData.phone);
+    }
+  };
 
   const shippingCost = 15000;
   const subtotal = items.reduce((sum, it) => sum + it.price * it.quantity, 0);
@@ -66,6 +87,13 @@ const Checkout = () => {
   };
 
   const handleWhatsAppClick = async () => {
+    const loggedInUser = currentUser || JSON.parse(localStorage.getItem('user') || 'null');
+    if (!loggedInUser) {
+      alert('🔒 Anda harus login atau daftar akun terlebih dahulu sebelum dapat menyelesaikan checkout!');
+      setIsAuthOpen(true);
+      return;
+    }
+
     if (!customerName.trim()) {
       alert('Silakan isi Nama Lengkap Penerima terlebih dahulu!');
       return;
@@ -176,6 +204,71 @@ const Checkout = () => {
             <span>CHECKOUT - BAYAR VIA WA</span>
           </div>
         </div>
+
+        {/* Status Login / Notifikasi Wajib Login */}
+        {!currentUser ? (
+          <div
+            style={{
+              background: 'rgba(239, 68, 68, 0.15)',
+              border: '1.5px solid #ef4444',
+              borderRadius: '12px',
+              padding: '16px 20px',
+              marginBottom: '20px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '14px',
+              flexWrap: 'wrap',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <span style={{ fontSize: '28px' }}>🔒</span>
+              <div>
+                <div style={{ fontWeight: '700', color: '#fca5a5', fontSize: '15px' }}>
+                  Wajib Login Untuk Melanjutkan Checkout
+                </div>
+                <div style={{ color: '#cbd5e1', fontSize: '13px' }}>
+                  Anda belum masuk. Silakan login atau daftar akun agar pesanan Anda dapat diproses.
+                </div>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsAuthOpen(true)}
+              style={{
+                background: '#22c55e',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '8px',
+                padding: '10px 18px',
+                fontWeight: '700',
+                fontSize: '13px',
+                cursor: 'pointer',
+                boxShadow: '0 2px 8px rgba(34, 197, 94, 0.35)',
+              }}
+            >
+              Masuk / Daftar Akun Sekarang →
+            </button>
+          </div>
+        ) : (
+          <div
+            style={{
+              background: 'rgba(34, 197, 94, 0.1)',
+              border: '1px solid rgba(34, 197, 94, 0.3)',
+              borderRadius: '10px',
+              padding: '10px 16px',
+              marginBottom: '20px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              fontSize: '13px',
+              color: '#86efac',
+            }}
+          >
+            <span>✓ Masuk sebagai: <strong>{currentUser.name}</strong> ({currentUser.email})</span>
+            <span style={{ fontSize: '12px', color: '#94a3b8' }}>Akun Terverifikasi</span>
+          </div>
+        )}
 
         {/* 1. Ringkasan Pesanan */}
         <section className="checkout-dark-section">
@@ -360,9 +453,26 @@ const Checkout = () => {
             <span>💬</span> 4. Konfirmasi &amp; Bayar via WhatsApp
           </h3>
 
-          <button className="btn-whatsapp-giant" onClick={handleWhatsAppClick}>
-            <span style={{ fontSize: '24px' }}>💬</span> LANJUT KE WHATSAPP
-          </button>
+          {!currentUser ? (
+            <button
+              type="button"
+              className="btn-whatsapp-giant"
+              onClick={() => {
+                alert('🔒 Silakan login atau daftar akun terlebih dahulu untuk melanjutkan checkout!');
+                setIsAuthOpen(true);
+              }}
+              style={{
+                background: 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)',
+                cursor: 'pointer',
+              }}
+            >
+              <span style={{ fontSize: '24px' }}>🔒</span> LOGIN DAHULU UNTUK CHECKOUT
+            </button>
+          ) : (
+            <button className="btn-whatsapp-giant" onClick={handleWhatsAppClick}>
+              <span style={{ fontSize: '24px' }}>💬</span> LANJUT KE WHATSAPP
+            </button>
+          )}
 
           <div className="wa-bubble-preview-box">
             <span className="info-symbol">ⓘ</span>
@@ -389,6 +499,14 @@ const Checkout = () => {
           <span>CLOVER LADSCLUB • Aman • Cepat • Terpercaya</span>
         </div>
       </div>
+
+      {/* Modal Login & Register */}
+      <AuthModal
+        isOpen={isAuthOpen}
+        onClose={() => setIsAuthOpen(false)}
+        user={currentUser}
+        onAuthChange={handleAuthChange}
+      />
     </div>
   );
 };
