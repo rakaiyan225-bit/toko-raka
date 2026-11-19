@@ -126,4 +126,17 @@ router.put('/:id/status', async (req, res) => {
   }
 });
 
+// DELETE /:id - Delete order
+router.delete('/:id', async (req, res) => {
+  try {
+    if (mongoose.connection.readyState === 1) {
+      await Order.findByIdAndDelete(req.params.id);
+    }
+    inMemoryOrders = inMemoryOrders.filter((o) => o._id !== req.params.id && o.orderId !== req.params.id);
+    res.json({ success: true, message: 'Pesanan berhasil dihapus' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 module.exports = router;

@@ -21,30 +21,79 @@ const Customers = () => {
 
   useEffect(() => {
     const fetchCustomers = async () => {
+      let remoteList = [];
       try {
         const res = await axios.get('/api/customers');
-        if (res.data && res.data.success && Array.isArray(res.data.data) && res.data.data.length > 0) {
-          const colors = ['#22c55e', '#6366f1', '#f97316', '#f43f5e', '#06b6d4', '#8b5cf6'];
-          const mapped = res.data.data.map((c, i) => ({
-            ...c,
-            initials: c.name
-              ? c.name
-                  .split(' ')
-                  .map((n) => n[0])
-                  .join('')
-                  .substring(0, 2)
-                  .toUpperCase()
-              : 'PL',
-            avatarBg: colors[i % colors.length],
-          }));
-          setCustomers(mapped);
+        if (res.data && res.data.success && Array.isArray(res.data.data)) {
+          remoteList = res.data.data;
         }
-      } catch (e) {
-        // Fallback to defaultCustomers
-      }
+      } catch (e) {}
+
+      let localList = [];
+      try {
+        localList = JSON.parse(localStorage.getItem('clover_custom_customers') || '[]');
+      } catch (e) {}
+
+      // Ambil juga customer dari pesanan
+      try {
+        const localOrders = JSON.parse(localStorage.getItem('clover_custom_orders') || '[]');
+        localOrders.forEach((ord) => {
+          if (ord.customer && ord.customer.name) {
+            const exists = localList.some(
+              (c) => c.phone === ord.customer.phone || c.name.toLowerCase() === ord.customer.name.toLowerCase()
+            );
+            if (!exists) {
+              localList.push({
+                _id: 'cust_' + ord.orderId,
+                name: ord.customer.name,
+                email: ord.customer.email || '-',
+                phone: ord.customer.phone || '-',
+                totalOrders: 1,
+                totalSpent: ord.totalAmount || 0,
+                status: 'Aktif',
+              });
+            }
+          }
+        });
+      } catch (e) {}
+
+      const colors = ['#22c55e', '#6366f1', '#f97316', '#f43f5e', '#06b6d4', '#8b5cf6'];
+      const map = new Map();
+      remoteList.forEach((c) => map.set(c._id || c.email || c.name, c));
+      localList.forEach((c) => {
+        const key = c._id || c.email || c.name;
+        if (!map.has(key)) map.set(key, c);
+      });
+
+      const merged = Array.from(map.values()).map((c, i) => ({
+        ...c,
+        initials: c.name
+          ? c.name
+              .split(' ')
+              .map((n) => n[0])
+              .join('')
+              .substring(0, 2)
+              .toUpperCase()
+          : 'PL',
+        avatarBg: colors[i % colors.length],
+      }));
+
+      setCustomers(merged);
     };
     fetchCustomers();
   }, []);
+
+  const handleDeleteCustomer = async (id) => {
+    if (!window.confirm('Hapus pelanggan ini?')) return;
+    try {
+      await axios.delete(`/api/customers/${id}`);
+    } catch (e) {}
+    const updated = customers.filter((c) => c._id !== id);
+    setCustomers(updated);
+    try {
+      localStorage.setItem('clover_custom_customers', JSON.stringify(updated));
+    } catch (e) {}
+  };
 
   const handleAddSubmit = async (e) => {
     e.preventDefault();
@@ -117,8 +166,8 @@ const Customers = () => {
           </div>
           <div className="stat-card-details">
             <p className="stat-label">Pelanggan Baru</p>
-            <h2 className="stat-value">0</h2>
-            <p className="stat-growth positive">↗ Belum ada data</p>
+            <h2 className="stat-value">{customers.length}</h2>
+            <p className="stat-growth positive">{customers.length > 0 ? `↗ ${customers.length} pelanggan terdata` : '↗ Belum ada data'}</p>
           </div>
         </div>
 
@@ -128,8 +177,12 @@ const Customers = () => {
           </div>
           <div className="stat-card-details">
             <p className="stat-label">Pelanggan Aktif</p>
-            <h2 className="stat-value">0</h2>
-            <p className="stat-subdetail">0% dari total pelanggan</p>
+            <h2 className="stat-value">{customers.filter((c) => c.status === 'Aktif').length}</h2>
+            <p className="stat-subdetail">
+              {customers.length > 0
+                ? `${Math.round((customers.filter((c) => c.status === 'Aktif').length / customers.length) * 100)}% dari total pelanggan`
+                : '0% dari total pelanggan'}
+            </p>
           </div>
         </div>
 
@@ -139,8 +192,10 @@ const Customers = () => {
           </div>
           <div className="stat-card-details">
             <p className="stat-label">Total Transaksi</p>
-            <h2 className="stat-value">0</h2>
-            <p className="stat-growth positive">↗ Belum ada transaksi</p>
+            <h2 className="stat-value">{customers.reduce((sum, c) => sum + (c.totalOrders || 0), 0)}</h2>
+            <p className="stat-growth positive">
+              {customers.reduce((sum, c) => sum + (c.totalOrders || 0), 0) > 0 ? '↗ Transaksi tercatat' : '↗ Belum ada transaksi'}
+            </p>
           </div>
         </div>
       </section>
@@ -202,9 +257,11 @@ const Customers = () => {
                         </button>
                         <button
                           className="btn-action-outline-sm"
-                          onClick={() => setSelectedCustomer(cust)}
+                          style={{ color: '#ef4444', borderColor: '#fca5a5' }}
+                          onClick={() => handleDeleteCustomer(cust._id)}
+                          title="Hapus Pelanggan"
                         >
-                          <span className="btn-icon">✏</span> Edit
+                          <span className="btn-icon">🗑</span>
                         </button>
                       </div>
                     </td>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const formatPrice = (price) => {
   return 'Rp' + price.toLocaleString('id-ID').replace(/,/g, '.');
@@ -33,12 +34,21 @@ const paymentOptions = [
 const Checkout = () => {
   const [items, setItems] = useState([defaultCheckoutItem]);
   const [selectedMethod, setSelectedMethod] = useState('DANA');
+  const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [customerAddress, setCustomerAddress] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem('cart') || '[]');
     if (saved.length > 0) {
       setItems(saved);
+    }
+    const loggedIn = JSON.parse(localStorage.getItem('user') || 'null');
+    if (loggedIn) {
+      if (loggedIn.name) setCustomerName(loggedIn.name);
+      if (loggedIn.phone) setCustomerPhone(loggedIn.phone);
     }
   }, []);
 
@@ -55,16 +65,99 @@ const Checkout = () => {
     } catch (e) {}
   };
 
-  const handleWhatsAppClick = () => {
+  const handleWhatsAppClick = async () => {
+    if (!customerName.trim()) {
+      alert('Silakan isi Nama Lengkap Penerima terlebih dahulu!');
+      return;
+    }
+    if (!customerPhone.trim()) {
+      alert('Silakan isi Nomor WhatsApp Penerima terlebih dahulu!');
+      return;
+    }
+    if (!customerAddress.trim()) {
+      alert('Silakan isi Alamat Lengkap Pengiriman terlebih dahulu!');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    const randomNum = Math.floor(10000 + Math.random() * 90000);
+    const orderId = `#CLD${randomNum}`;
+
+    const orderPayload = {
+      orderId,
+      customer: {
+        name: customerName.trim(),
+        phone: customerPhone.trim(),
+        address: customerAddress.trim(),
+        email: '-',
+      },
+      items: items.map((it) => ({
+        product: it._id,
+        name: it.name,
+        size: it.size || 'M',
+        quantity: it.quantity || 1,
+        price: it.price,
+      })),
+      totalAmount: totalPayment,
+      shippingCost,
+      paymentMethod: selectedMethod,
+      status: 'Diproses',
+      createdAt: new Date().toISOString(),
+    };
+
+    // 1. Simpan ke backend API
+    try {
+      await axios.post('/api/orders', orderPayload);
+    } catch (err) {
+      console.warn('API save order error, fallback local:', err);
+    }
+
+    // 2. Simpan ke local cache agar langsung muncul di admin
+    try {
+      const existingOrders = JSON.parse(localStorage.getItem('clover_custom_orders') || '[]');
+      const updatedOrders = [orderPayload, ...existingOrders.filter((o) => o.orderId !== orderId)];
+      localStorage.setItem('clover_custom_orders', JSON.stringify(updatedOrders));
+
+      // Simpan juga ke daftar pelanggan
+      const existingCusts = JSON.parse(localStorage.getItem('clover_custom_customers') || '[]');
+      const existingCustIdx = existingCusts.findIndex(
+        (c) => c.phone === customerPhone.trim() || c.name.toLowerCase() === customerName.trim().toLowerCase()
+      );
+      if (existingCustIdx !== -1) {
+        existingCusts[existingCustIdx].totalOrders += 1;
+        existingCusts[existingCustIdx].totalSpent += totalPayment;
+      } else {
+        existingCusts.unshift({
+          _id: 'cust_' + Date.now(),
+          name: customerName.trim(),
+          phone: customerPhone.trim(),
+          email: '-',
+          totalOrders: 1,
+          totalSpent: totalPayment,
+          status: 'Aktif',
+          createdAt: new Date().toISOString(),
+        });
+      }
+      localStorage.setItem('clover_custom_customers', JSON.stringify(existingCusts));
+
+      // Kosongkan keranjang
+      localStorage.removeItem('cart');
+    } catch (e) {}
+
+    // 3. Format pesan WhatsApp
     const itemSummaries = items
       .map((it) => `- ${it.name} (Ukuran: ${it.size || 'M'}, Qty: ${it.quantity})`)
       .join('\n');
-    const autoMessage = `Halo Min, saya mau konfirmasi pesanan CLOVER LADSCLUB:\n\n${itemSummaries}\n\nTotal: ${formatPrice(totalPayment)}\nMetode Pembayaran: ${selectedMethod}\n\nMohon diproses ya Min, terima kasih! ☘️`;
+    const autoMessage = `Halo Min, saya mau konfirmasi pesanan CLOVER LADSCLUB:\n\n*ID Pesanan:* ${orderId}\n*Nama:* ${customerName.trim()}\n*No. HP:* ${customerPhone.trim()}\n*Alamat:* ${customerAddress.trim()}\n\n*Pesanan:*\n${itemSummaries}\n\n*Total Bayar:* ${formatPrice(totalPayment)}\n*Metode Pembayaran:* ${selectedMethod}\n\nMohon diproses ya Min, terima kasih! ☘️`;
     const waUrl = `https://wa.me/6281234567890?text=${encodeURIComponent(autoMessage)}`;
+
+    setIsSubmitting(false);
     window.open(waUrl, '_blank');
+    alert(`✅ Pesanan Anda berhasil dicatat dengan ID ${orderId}! Mengarahkan ke WhatsApp admin...`);
   };
 
-  const autoFilledText = `Halo Min, saya mau konfirmasi pesanan CLOVER LADSCLUB:\n${items.map(it => `- ${it.name} [Ukuran: ${it.size || 'M'}, Qty: ${it.quantity}]`).join('\n')}\nTotal: ${formatPrice(totalPayment)} via ${selectedMethod}`;
+  const autoFilledText = `Halo Min, saya mau konfirmasi pesanan CLOVER LADSCLUB:\n${items.map((it) => `- ${it.name} [Ukuran: ${it.size || 'M'}, Qty: ${it.quantity}]`).join('\n')}\nTotal: ${formatPrice(totalPayment)} via ${selectedMethod}`;
 
   return (
     <div className="checkout-dark-theme-wrapper">
@@ -151,10 +244,92 @@ const Checkout = () => {
           </div>
         </section>
 
-        {/* 2. Pilih Metode Pembayaran */}
+        {/* 2. Data Penerima & Pengiriman */}
         <section className="checkout-dark-section">
           <h3 className="checkout-dark-section-title">
-            <span>💳</span> 2. Pilih Metode Pembayaran
+            <span>📍</span> 2. Data Penerima &amp; Pengiriman
+          </h3>
+
+          <div className="checkout-dark-card" style={{ padding: '1.25rem' }}>
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', fontSize: '13px', color: '#94a3b8', marginBottom: '6px', fontWeight: '500' }}>
+                Nama Lengkap Penerima <span style={{ color: '#ef4444' }}>*</span>
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="Contoh: Raka Pratama"
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                style={{
+                  width: '100%',
+                  background: '#1e293b',
+                  color: '#ffffff',
+                  border: '1px solid #334155',
+                  borderRadius: '8px',
+                  padding: '10px 14px',
+                  fontSize: '14px',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', fontSize: '13px', color: '#94a3b8', marginBottom: '6px', fontWeight: '500' }}>
+                Nomor WhatsApp Aktif <span style={{ color: '#ef4444' }}>*</span>
+              </label>
+              <input
+                type="tel"
+                required
+                placeholder="Contoh: 081234567890"
+                value={customerPhone}
+                onChange={(e) => setCustomerPhone(e.target.value)}
+                style={{
+                  width: '100%',
+                  background: '#1e293b',
+                  color: '#ffffff',
+                  border: '1px solid #334155',
+                  borderRadius: '8px',
+                  padding: '10px 14px',
+                  fontSize: '14px',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: '13px', color: '#94a3b8', marginBottom: '6px', fontWeight: '500' }}>
+                Alamat Lengkap Pengiriman <span style={{ color: '#ef4444' }}>*</span>
+              </label>
+              <textarea
+                rows="3"
+                required
+                placeholder="Nama jalan, nomor rumah, RT/RW, kecamatan, kota/kabupaten, kode pos"
+                value={customerAddress}
+                onChange={(e) => setCustomerAddress(e.target.value)}
+                style={{
+                  width: '100%',
+                  background: '#1e293b',
+                  color: '#ffffff',
+                  border: '1px solid #334155',
+                  borderRadius: '8px',
+                  padding: '10px 14px',
+                  fontSize: '14px',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                  resize: 'vertical',
+                }}
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* 3. Pilih Metode Pembayaran */}
+        <section className="checkout-dark-section">
+          <h3 className="checkout-dark-section-title">
+            <span>💳</span> 3. Pilih Metode Pembayaran
           </h3>
 
           <div className="payment-methods-dark-list">
@@ -179,10 +354,10 @@ const Checkout = () => {
           </div>
         </section>
 
-        {/* 3. Konfirmasi & Bayar via WhatsApp */}
+        {/* 4. Konfirmasi & Bayar via WhatsApp */}
         <section className="checkout-dark-section">
           <h3 className="checkout-dark-section-title">
-            <span>💬</span> 3. Konfirmasi & Bayar via WhatsApp
+            <span>💬</span> 4. Konfirmasi &amp; Bayar via WhatsApp
           </h3>
 
           <button className="btn-whatsapp-giant" onClick={handleWhatsAppClick}>

@@ -7,16 +7,18 @@ const orderSchema = new mongoose.Schema({
   },
   customer: {
     name: { type: String, required: true },
-    email: { type: String, required: true },
-    phone: { type: String },
-    address: { type: String },
+    email: { type: String, default: '-' },
+    phone: { type: String, default: '-' },
+    address: { type: String, default: '-' },
   },
   items: [
     {
       product: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Product',
+        type: mongoose.Schema.Types.Mixed,
         required: true,
+      },
+      name: {
+        type: String,
       },
       quantity: {
         type: Number,

@@ -46,19 +46,45 @@ const Dashboard = () => {
 
       try {
         const ordersRes = await axios.get('/api/dashboard/recent-orders');
-        if (ordersRes.data && ordersRes.data.success && Array.isArray(ordersRes.data.data)) {
+        if (ordersRes.data && ordersRes.data.success && Array.isArray(ordersRes.data.data) && ordersRes.data.data.length > 0) {
           const mapped = ordersRes.data.data.map(o => ({
             orderId: o.orderId,
             customerName: o.customer?.name || 'Pelanggan',
-            productName: o.items?.[0]?.product?.name || 'Produk Clover',
+            productName: o.items?.[0]?.product?.name || o.items?.[0]?.name || 'Produk Clover',
             total: o.totalAmount,
             status: o.status,
           }));
-          if (mapped.length > 0) setRecentOrders(mapped);
+          setRecentOrders(mapped);
         }
       } catch (e) {
         // Fallback to defaultRecentOrders
       }
+
+      // Sync dari local cache
+      try {
+        const localOrders = JSON.parse(localStorage.getItem('clover_custom_orders') || '[]');
+        const localProducts = JSON.parse(localStorage.getItem('clover_custom_products') || '[]');
+        const localCusts = JSON.parse(localStorage.getItem('clover_custom_customers') || '[]');
+
+        if (localOrders.length > 0) {
+          const totalSales = localOrders.reduce((sum, o) => sum + (o.totalAmount || 0), 0);
+          setStats({
+            totalSales,
+            totalOrders: localOrders.length,
+            totalProducts: localProducts.length,
+            totalCustomers: localCusts.length,
+          });
+
+          const mappedLocal = localOrders.slice(0, 5).map((o) => ({
+            orderId: o.orderId,
+            customerName: o.customer?.name || 'Pelanggan',
+            productName: o.items?.[0]?.name || o.items?.[0]?.product?.name || 'Produk Clover',
+            total: o.totalAmount,
+            status: o.status,
+          }));
+          setRecentOrders(mappedLocal);
+        }
+      } catch (e) {}
     };
 
     fetchDashboardData();

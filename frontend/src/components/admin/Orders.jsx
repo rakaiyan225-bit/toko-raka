@@ -17,14 +17,28 @@ const Orders = () => {
 
   useEffect(() => {
     const fetchOrders = async () => {
+      let remoteList = [];
       try {
         const res = await axios.get('/api/orders');
-        if (res.data && res.data.success && Array.isArray(res.data.data) && res.data.data.length > 0) {
-          setOrders(res.data.data);
+        if (res.data && res.data.success && Array.isArray(res.data.data)) {
+          remoteList = res.data.data;
         }
-      } catch (e) {
-        // Fallback to defaultOrders
-      }
+      } catch (e) {}
+
+      let localList = [];
+      try {
+        localList = JSON.parse(localStorage.getItem('clover_custom_orders') || '[]');
+      } catch (e) {}
+
+      const map = new Map();
+      remoteList.forEach((o) => map.set(o.orderId || o._id, o));
+      localList.forEach((o) => {
+        const key = o.orderId || o._id;
+        if (!map.has(key)) {
+          map.set(key, o);
+        }
+      });
+      setOrders(Array.from(map.values()));
     };
     fetchOrders();
   }, []);
@@ -32,13 +46,27 @@ const Orders = () => {
   const handleStatusChange = async (orderId, status) => {
     try {
       await axios.put(`/api/orders/${orderId}/status`, { status });
-    } catch (e) {
-      // Local update even if API is not yet running
-    }
-    setOrders((prev) =>
-      prev.map((ord) => (ord._id === orderId || ord.orderId === orderId ? { ...ord, status } : ord))
+    } catch (e) {}
+    const updated = orders.map((ord) =>
+      ord._id === orderId || ord.orderId === orderId ? { ...ord, status } : ord
     );
+    setOrders(updated);
+    try {
+      localStorage.setItem('clover_custom_orders', JSON.stringify(updated));
+    } catch (e) {}
     setStatusModalOrder(null);
+  };
+
+  const handleDeleteOrder = async (orderId) => {
+    if (!window.confirm('Hapus pesanan ini?')) return;
+    try {
+      await axios.delete(`/api/orders/${orderId}`);
+    } catch (e) {}
+    const updated = orders.filter((o) => o._id !== orderId && o.orderId !== orderId);
+    setOrders(updated);
+    try {
+      localStorage.setItem('clover_custom_orders', JSON.stringify(updated));
+    } catch (e) {}
   };
 
   const filteredOrders = orders.filter((order) => {
@@ -151,16 +179,23 @@ const Orders = () => {
                 filteredOrders.map((order, idx) => (
                   <tr key={order._id || idx}>
                     <td className="fw-bold">{order.orderId}</td>
-                    <td>{order.customer?.name}</td>
-                    <td>{order.items?.[0]?.product?.name || order.items?.[0]?.name || 'Produk'}</td>
                     <td>
-                      {order.showAmountPill || idx === 0 ? (
-                        <span className="price-pill-green">
-                          {formatPrice(order.totalAmount || 199000)} <span className="pill-info-icon">ⓘ</span>
-                        </span>
-                      ) : (
-                        <span className="fw-bold">{formatPrice(order.totalAmount)}</span>
+                      <div className="fw-semibold">{order.customer?.name}</div>
+                      {order.customer?.phone && <div style={{ fontSize: '12px', color: '#64748b' }}>{order.customer.phone}</div>}
+                    </td>
+                    <td>
+                      <div className="fw-semibold">{order.items?.[0]?.name || order.items?.[0]?.product?.name || 'Produk Clover'}</div>
+                      <span style={{ fontSize: '12px', color: '#15803d', fontWeight: '600' }}>
+                        Ukuran: {order.items?.[0]?.size || 'M'}
+                      </span>
+                      {order.items?.length > 1 && (
+                        <div style={{ fontSize: '11px', color: '#64748b' }}>
+                          +{order.items.length - 1} produk lainnya
+                        </div>
                       )}
+                    </td>
+                    <td>
+                      <span className="fw-bold">{formatPrice(order.totalAmount)}</span>
                     </td>
                     <td>{renderStatusBadge(order)}</td>
                     <td>
@@ -172,13 +207,21 @@ const Orders = () => {
                             setNewStatus(order.status);
                           }}
                         >
-                          <span className="btn-icon">✏</span> Ubah Status
+                          <span className="btn-icon">✏</span> Status
                         </button>
                         <button
                           className="btn-action-outline detail-btn"
                           onClick={() => setSelectedOrder(order)}
                         >
                           <span className="btn-icon">👁</span> Detail
+                        </button>
+                        <button
+                          className="btn-action-outline"
+                          style={{ color: '#ef4444', borderColor: '#fca5a5' }}
+                          onClick={() => handleDeleteOrder(order._id || order.orderId)}
+                          title="Hapus Pesanan"
+                        >
+                          <span className="btn-icon">🗑</span>
                         </button>
                       </div>
                     </td>
