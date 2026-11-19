@@ -210,9 +210,9 @@ const Home = () => {
                         {product.name.includes('Hoodie') ? '🧥' : '👕'}
                       </span>
                       <img
-                        src="/assets/logo-2.jpg"
+                        src="/assets/logo.jpg"
                         alt="CLOVER LADS CLUB"
-                        style={{ height: '24px', maxWidth: '85%', objectFit: 'contain' }}
+                        style={{ width: '38px', height: '38px', borderRadius: '50%', objectFit: 'cover', boxShadow: '0 2px 6px rgba(0,0,0,0.2)' }}
                       />
                     </div>
                   )}

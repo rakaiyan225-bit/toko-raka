@@ -31,9 +31,31 @@
 .sidebar-brand-header {
   display: flex;
   align-items: center;
-  justify-content: center;
   margin-bottom: 28px;
-  padding: 8px;
+  padding: 4px 8px;
+}
+
+.sidebar-brand-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  width: 100%;
+}
+
+.sidebar-patch-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.sidebar-patch-logo:hover {
+  transform: scale(1.05);
 }
 
 .sidebar-logo-link {
@@ -65,8 +87,8 @@
 
 .sidebar-brand-name h2 {
   font-size: 18px;
-  font-weight: 800;
-  letter-spacing: 1px;
+  font-weight: 900;
+  letter-spacing: 1.2px;
   margin: 0;
   color: #ffffff;
   line-height: 1.1;
@@ -77,7 +99,7 @@
   letter-spacing: 2px;
   margin: 0;
   color: #86efac;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 /* Sidebar Menu Items */

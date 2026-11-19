@@ -31,10 +31,14 @@ const Navbar = () => {
       <div className="navbar-container">
         <Link to="/" className="navbar-logo">
           <img
-            src="/assets/logo-2.jpg"
+            src="/assets/logo.jpg"
             alt="CLOVER LADS CLUB"
-            className="brand-logo-img"
+            className="brand-logo-patch"
           />
+          <div className="navbar-brand-text">
+            <span className="brand-title">CLOVER</span>
+            <span className="brand-subtitle">LADSCLUB</span>
+          </div>
         </Link>
 
         <form className="navbar-search" onSubmit={handleSearch}>

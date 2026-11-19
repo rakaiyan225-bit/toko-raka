@@ -15,14 +15,18 @@ const Sidebar = () => {
 
   return (
     <aside className="sidebar-dark-green">
-      {/* Brand Header with Gambar 2 Logo */}
+      {/* Brand Header with Circular Embroidered Logo */}
       <div className="sidebar-brand-header">
-        <NavLink to="/admin" className="sidebar-logo-link">
+        <NavLink to="/admin" className="sidebar-brand-link">
           <img
-            src="/assets/logo-2.jpg"
+            src="/assets/logo.jpg"
             alt="CLOVER LADS CLUB"
-            className="sidebar-logo-img"
+            className="sidebar-patch-logo"
           />
+          <div className="sidebar-brand-name">
+            <h2>CLOVER</h2>
+            <p>LADSCLUB</p>
+          </div>
         </NavLink>
       </div>
 

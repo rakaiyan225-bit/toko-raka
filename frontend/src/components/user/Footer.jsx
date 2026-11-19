@@ -7,10 +7,14 @@ const Footer = () => {
         <div className="footer-column">
           <div className="footer-logo-wrapper">
             <img
-              src="/assets/logo-2.jpg"
+              src="/assets/logo.jpg"
               alt="CLOVER LADS CLUB"
-              className="footer-logo-img"
+              className="footer-logo-patch"
             />
+            <div className="footer-brand-text">
+              <span className="footer-brand-title">CLOVER</span>
+              <span className="footer-brand-subtitle">LADSCLUB</span>
+            </div>
           </div>
           <p className="footer-desc">
             Fashion streetwear lokal untuk generasi aktif. Kualitas terbaik, gaya kasual.
