@@ -361,7 +361,7 @@ const Checkout = () => {
           </h3>
 
           <button className="btn-whatsapp-giant" onClick={handleWhatsAppClick}>
-            <span style={{ fontSize: '24px' }}>💬</span> LANJUT KE WHATSAPP ADMIN (0895-1378-5705)
+            <span style={{ fontSize: '24px' }}>💬</span> LANJUT KE WHATSAPP ADMIN
           </button>
 
           <div className="wa-bubble-preview-box">
