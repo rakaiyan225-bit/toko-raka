@@ -14,6 +14,14 @@ const categories = [
   { name: 'Aksesori', icon: '🧢' },
 ];
 
+const getProductImage = (img) => {
+  if (!img) return '/assets/prod-1.jpg';
+  if (img.startsWith('data:') || img.startsWith('http://') || img.startsWith('https://') || img.startsWith('/')) {
+    return img;
+  }
+  return `/uploads/${img}`;
+};
+
 const formatPrice = (price) => {
   return 'Rp' + price.toLocaleString('id-ID').replace(/,/g, '.');
 };
@@ -26,13 +34,30 @@ const Home = () => {
 
   useEffect(() => {
     const fetchProducts = async () => {
+      let remoteList = [];
       try {
         const res = await axios.get('/api/products');
-        if (res.data && res.data.success && Array.isArray(res.data.data) && res.data.data.length > 0) {
-          setProducts(res.data.data);
+        if (res.data && res.data.success && Array.isArray(res.data.data)) {
+          remoteList = res.data.data;
         }
-      } catch {
-        // Fallback to hardcoded
+      } catch {}
+
+      let localList = [];
+      try {
+        localList = JSON.parse(localStorage.getItem('clover_custom_products') || '[]');
+      } catch {}
+
+      const map = new Map();
+      remoteList.forEach((p) => map.set(p._id, p));
+      localList.forEach((p) => {
+        if (!map.has(p._id) || (!map.get(p._id).image && p.image)) {
+          map.set(p._id, p);
+        }
+      });
+
+      const merged = Array.from(map.values());
+      if (merged.length > 0) {
+        setProducts(merged);
       }
     };
     fetchProducts();
@@ -141,56 +166,58 @@ const Home = () => {
         </div>
 
         <div className="product-grid">
-          {filteredProducts.map((product) => (
-            <div key={product._id} className="product-card">
-              <Link to={`/product/${product._id}`} className="product-image-link">
-                <div className="product-image">
-                  <img
-                    src={
-                      product.image
-                        ? product.image.startsWith('http') || product.image.startsWith('/')
-                          ? product.image
-                          : `http://localhost:5000${product.image}`
-                        : '/assets/prod-1.jpg'
-                    }
-                    alt={product.name}
-                  />
-                </div>
-              </Link>
-
-              <div className="product-info">
-                <Link to={`/product/${product._id}`}>
-                  <h3 className="product-name">{product.name}</h3>
+          {filteredProducts.length === 0 ? (
+            <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '3rem 1rem', background: '#f8fafc', borderRadius: '12px', color: '#64748b' }}>
+              <span style={{ fontSize: '40px', display: 'block', marginBottom: '0.75rem' }}>🛍️</span>
+              <h3 style={{ margin: '0 0 0.5rem 0', color: '#1e293b' }}>Belum Ada Produk di Katalog</h3>
+              <p style={{ margin: 0, fontSize: '14px' }}>Buka panel admin untuk menambahkan produk baru.</p>
+            </div>
+          ) : (
+            filteredProducts.map((product) => (
+              <div key={product._id} className="product-card">
+                <Link to={`/product/${product._id}`} className="product-image-link">
+                  <div className="product-image">
+                    <img
+                      src={getProductImage(product.image)}
+                      alt={product.name}
+                    />
+                  </div>
                 </Link>
 
-                <p className="product-price">{formatPrice(product.price)}</p>
+                <div className="product-info">
+                  <Link to={`/product/${product._id}`}>
+                    <h3 className="product-name">{product.name}</h3>
+                  </Link>
 
-                <div className="product-rating">
-                  <span className="stars">★★★★★</span>
-                  <span className="rating-num">{product.rating || 4.8}</span>
-                  <span style={{ color: '#94a3b8', margin: '0 4px' }}>|</span>
-                  <span className="sold-count">{product.sold || '1.2rb'} terjual</span>
-                </div>
+                  <p className="product-price">{formatPrice(product.price)}</p>
 
-                <div className="product-actions">
-                  <button
-                    type="button"
-                    className="btn btn-outline"
-                    onClick={() => addToCart(product)}
-                  >
-                    Tambah Keranjang
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={() => buyNow(product)}
-                  >
-                    Beli Sekarang
-                  </button>
+                  <div className="product-rating">
+                    <span className="stars">★★★★★</span>
+                    <span className="rating-num">{product.rating || 5.0}</span>
+                    <span style={{ color: '#94a3b8', margin: '0 4px' }}>|</span>
+                    <span className="sold-count">{product.sold || 0} terjual</span>
+                  </div>
+
+                  <div className="product-actions">
+                    <button
+                      type="button"
+                      className="btn btn-outline"
+                      onClick={() => addToCart(product)}
+                    >
+                      Tambah Keranjang
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={() => buyNow(product)}
+                    >
+                      Beli Sekarang
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </section>
     </div>

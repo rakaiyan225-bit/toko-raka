@@ -28,6 +28,14 @@ const renderStars = (rating) => {
   );
 };
 
+const getProductImage = (img) => {
+  if (!img) return '/assets/prod-1.jpg';
+  if (img.startsWith('data:') || img.startsWith('http://') || img.startsWith('https://') || img.startsWith('/')) {
+    return img;
+  }
+  return `/uploads/${img}`;
+};
+
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -40,13 +48,31 @@ const ProductDetail = () => {
     const fetchProduct = async () => {
       try {
         const res = await axios.get(`/api/products/${id}`);
-        setProduct(res.data);
-      } catch {
-        const found = hardcodedProducts.find(p => p._id === id);
-        setProduct(found || hardcodedProducts[0]);
-      } finally {
-        setLoading(false);
-      }
+        if (res.data && res.data.success && res.data.data) {
+          setProduct(res.data.data);
+          setLoading(false);
+          return;
+        } else if (res.data && res.data._id) {
+          setProduct(res.data);
+          setLoading(false);
+          return;
+        }
+      } catch (e) {}
+
+      // Check localStorage
+      try {
+        const local = JSON.parse(localStorage.getItem('clover_custom_products') || '[]');
+        const found = local.find(p => p._id === id);
+        if (found) {
+          setProduct(found);
+          setLoading(false);
+          return;
+        }
+      } catch (e) {}
+
+      const found = hardcodedProducts.find(p => p._id === id);
+      setProduct(found || null);
+      setLoading(false);
     };
     fetchProduct();
   }, [id]);
@@ -90,13 +116,7 @@ const ProductDetail = () => {
     <div className="product-detail">
       <div className="product-detail-container">
         <div className="product-detail-image">
-          {product.image ? (
-            <img src={product.image.startsWith('http') ? product.image : `http://localhost:5000${product.image}`} alt={product.name} />
-          ) : (
-            <div className="image-placeholder large">
-              <span>👕</span>
-            </div>
-          )}
+          <img src={getProductImage(product.image)} alt={product.name} />
         </div>
 
         <div className="product-detail-info">

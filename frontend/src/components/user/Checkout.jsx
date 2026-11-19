@@ -5,6 +5,14 @@ const formatPrice = (price) => {
   return 'Rp' + price.toLocaleString('id-ID').replace(/,/g, '.');
 };
 
+const getProductImage = (img) => {
+  if (!img) return null;
+  if (img.startsWith('data:') || img.startsWith('http://') || img.startsWith('https://') || img.startsWith('/')) {
+    return img;
+  }
+  return `/uploads/${img}`;
+};
+
 const defaultCheckoutItem = {
   name: 'Hoodie Clover Black',
   price: 289000,
@@ -76,8 +84,8 @@ const Checkout = () => {
             {items.map((item, index) => (
               <div key={index} className="checkout-order-item-row">
                 <div className="checkout-prod-thumb">
-                  {item.image ? (
-                    <img src={item.image.startsWith('http') ? item.image : `http://localhost:5000${item.image}`} alt={item.name} />
+                  {getProductImage(item.image) ? (
+                    <img src={getProductImage(item.image)} alt={item.name} />
                   ) : (
                     <span style={{ fontSize: '32px' }}>🧥</span>
                   )}

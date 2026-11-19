@@ -4,88 +4,9 @@ const mongoose = require('mongoose');
 const Product = require('../models/Product');
 const upload = require('../middleware/upload');
 
-const fallbackProducts = [
-  {
-    _id: 'prod1',
-    name: 'Kaos Oversize Hitam Clover',
-    description: 'Kaos oversize hitam premium dengan logo Clover. Bahan cotton combed 30s yang nyaman dipakai sehari-hari.',
-    price: 89000,
-    category: 'Kaos',
-    image: '',
-    stock: 150,
-    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
-    rating: 4.8,
-    sold: 1200,
-    isActive: true,
-  },
-  {
-    _id: 'prod2',
-    name: 'Kaos Putih Basic Ladsclub',
-    description: 'Kaos putih basic dengan desain minimalis Ladsclub. Bahan cotton combed 24s premium.',
-    price: 75000,
-    category: 'Kaos',
-    image: '',
-    stock: 200,
-    sizes: ['S', 'M', 'L', 'XL'],
-    rating: 4.9,
-    sold: 980,
-    isActive: true,
-  },
-  {
-    _id: 'prod3',
-    name: 'Hoodie Hitam Clover Club',
-    description: 'Hoodie hitam dengan desain eksklusif Clover Club. Bahan fleece tebal premium.',
-    price: 199000,
-    category: 'Hoodie',
-    image: '',
-    stock: 80,
-    sizes: ['S', 'M', 'L', 'XL'],
-    rating: 4.7,
-    sold: 2100,
-    isActive: true,
-  },
-  {
-    _id: 'prod4',
-    name: 'Hoodie Putih Clover Ladsclub',
-    description: 'Hoodie putih dengan branding Clover Ladsclub. Bahan baby terry yang lembut.',
-    price: 199000,
-    category: 'Hoodie',
-    image: '',
-    stock: 65,
-    sizes: ['S', 'M', 'L', 'XL'],
-    rating: 4.8,
-    sold: 1500,
-    isActive: true,
-  },
-  {
-    _id: 'prod5',
-    name: 'Hoodie Clover Black',
-    description: 'Hoodie premium full hitam dengan embroidery Clover. Edisi terbatas.',
-    price: 289000,
-    category: 'Hoodie',
-    image: '',
-    stock: 40,
-    sizes: ['M', 'L', 'XL'],
-    rating: 4.9,
-    sold: 850,
-    isActive: true,
-  },
-  {
-    _id: 'prod6',
-    name: 'Jaket Bomber Clover',
-    description: 'Jaket bomber dengan desain Clover. Bahan parasut premium anti air.',
-    price: 350000,
-    category: 'Jaket',
-    image: '',
-    stock: 30,
-    sizes: ['M', 'L', 'XL'],
-    rating: 4.6,
-    sold: 600,
-    isActive: true,
-  },
-];
+const fallbackProducts = [];
 
-let inMemoryProducts = [...fallbackProducts];
+let inMemoryProducts = [];
 
 // GET / - List all products
 router.get('/', async (req, res) => {
@@ -154,7 +75,11 @@ router.get('/:id', async (req, res) => {
 router.post('/', upload.single('image'), async (req, res) => {
   try {
     const productData = { ...req.body };
-    if (req.file) productData.image = `/uploads/${req.file.filename}`;
+    if (req.file) {
+      productData.image = `/uploads/${req.file.filename}`;
+    } else if (req.body.image) {
+      productData.image = req.body.image;
+    }
     if (productData.sizes && typeof productData.sizes === 'string') {
       productData.sizes = productData.sizes.split(',').map((s) => s.trim());
     }
@@ -182,7 +107,11 @@ router.post('/', upload.single('image'), async (req, res) => {
 router.put('/:id', upload.single('image'), async (req, res) => {
   try {
     const updateData = { ...req.body };
-    if (req.file) updateData.image = `/uploads/${req.file.filename}`;
+    if (req.file) {
+      updateData.image = `/uploads/${req.file.filename}`;
+    } else if (req.body.image) {
+      updateData.image = req.body.image;
+    }
     if (updateData.sizes && typeof updateData.sizes === 'string') {
       updateData.sizes = updateData.sizes.split(',').map((s) => s.trim());
     }

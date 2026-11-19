@@ -7,9 +7,18 @@ const formatPrice = (price) => {
 
 const defaultProducts = [];
 
+const getProductImage = (image) => {
+  if (!image) return null;
+  if (image.startsWith('data:') || image.startsWith('http://') || image.startsWith('https://') || image.startsWith('/')) {
+    return image;
+  }
+  return `/uploads/${image}`;
+};
+
 const Products = () => {
-  const [viewMode, setViewMode] = useState('form'); // 'form' (Tambah Barang) or 'list' (Daftar Produk)
+  const [viewMode, setViewMode] = useState('list'); // 'form' (Tambah Barang) or 'list' (Daftar Produk)
   const [products, setProducts] = useState(defaultProducts);
+  const [editingId, setEditingId] = useState(null);
 
   // Form State matching Image 4
   const [formData, setFormData] = useState({
@@ -22,18 +31,42 @@ const Products = () => {
     imageName: '',
     imageSize: '',
     imagePreview: null,
+    image: '',
+    file: null,
   });
 
   const [notification, setNotification] = useState('');
 
+  // Fetch and sync products
   useEffect(() => {
     const fetchProds = async () => {
+      let remoteList = [];
       try {
         const res = await axios.get('/api/products');
-        if (res.data && res.data.success && Array.isArray(res.data.data) && res.data.data.length > 0) {
-          setProducts(res.data.data);
+        if (res.data && res.data.success && Array.isArray(res.data.data)) {
+          remoteList = res.data.data;
         }
       } catch (e) {}
+
+      // Ambil dari localStorage cache agar tidak hilang saat refresh
+      let localList = [];
+      try {
+        localList = JSON.parse(localStorage.getItem('clover_custom_products') || '[]');
+      } catch (e) {}
+
+      // Gabungkan data: utamakan produk dengan gambar
+      const map = new Map();
+      remoteList.forEach((p) => map.set(p._id, p));
+      localList.forEach((p) => {
+        if (!map.has(p._id) || (!map.get(p._id).image && p.image)) {
+          map.set(p._id, p);
+        }
+      });
+
+      const merged = Array.from(map.values());
+      if (merged.length > 0) {
+        setProducts(merged);
+      }
     };
     fetchProds();
   }, []);
@@ -42,44 +75,126 @@ const Products = () => {
     const file = e.target.files[0];
     if (file) {
       const sizeMB = (file.size / (1024 * 1024)).toFixed(1) + 'MB';
-      setFormData({
-        ...formData,
-        imageName: file.name,
-        imageSize: sizeMB,
-        imagePreview: URL.createObjectURL(file),
-      });
+
+      // Baca sebagai Base64 agar tersimpan permanen di database dan localStorage
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData((prev) => ({
+          ...prev,
+          imageName: file.name,
+          imageSize: sizeMB,
+          imagePreview: reader.result,
+          image: reader.result, // Data URL base64
+          file: file,
+        }));
+      };
+      reader.readAsDataURL(file);
     }
   };
 
   const handleSaveProduct = async (e) => {
     e.preventDefault();
-    const newProduct = {
-      _id: 'prod_' + Date.now(),
+    const finalImage = formData.image || formData.imagePreview || '';
+
+    const payload = {
       name: formData.name,
       category: formData.category,
       price: Number(formData.price),
       stock: Number(formData.stock),
       description: formData.description,
       isActive: formData.isActive,
-      imageName: formData.imageName,
-      imageSize: formData.imageSize,
-      image: formData.imagePreview || '',
+      image: finalImage,
     };
 
-    try {
-      await axios.post('/api/products', {
-        name: formData.name,
-        category: formData.category,
-        price: Number(formData.price),
-        stock: Number(formData.stock),
-        description: formData.description,
-        isActive: formData.isActive,
-      });
-    } catch (err) {}
+    let savedProduct = null;
 
-    setProducts([newProduct, ...products]);
-    setNotification('Produk berhasil disimpan ke katalog!');
+    try {
+      if (editingId) {
+        const res = await axios.put(`/api/products/${editingId}`, payload);
+        if (res.data && res.data.success && res.data.data) {
+          savedProduct = res.data.data;
+        }
+      } else {
+        const res = await axios.post('/api/products', payload);
+        if (res.data && res.data.success && res.data.data) {
+          savedProduct = res.data.data;
+        }
+      }
+    } catch (err) {
+      console.warn('API save fallback to local:', err);
+    }
+
+    if (!savedProduct) {
+      savedProduct = {
+        _id: editingId || 'prod_' + Date.now(),
+        ...payload,
+        createdAt: new Date().toISOString(),
+      };
+    } else if (!savedProduct.image && finalImage) {
+      savedProduct.image = finalImage;
+    }
+
+    let updatedProducts;
+    if (editingId) {
+      updatedProducts = products.map((p) => (p._id === editingId ? savedProduct : p));
+    } else {
+      updatedProducts = [savedProduct, ...products.filter((p) => p._id !== savedProduct._id)];
+    }
+
+    setProducts(updatedProducts);
+    try {
+      localStorage.setItem('clover_custom_products', JSON.stringify(updatedProducts));
+    } catch (e) {}
+
+    setNotification(editingId ? 'Produk berhasil diperbarui!' : 'Produk berhasil disimpan ke katalog!');
     setTimeout(() => setNotification(''), 4000);
+
+    // Reset Form
+    setEditingId(null);
+    setFormData({
+      name: '',
+      category: 'Hoodie',
+      price: '',
+      stock: '',
+      description: '',
+      isActive: true,
+      imageName: '',
+      imageSize: '',
+      imagePreview: null,
+      image: '',
+      file: null,
+    });
+    setViewMode('list');
+  };
+
+  const handleDeleteProduct = async (id) => {
+    if (!window.confirm('Yakin ingin menghapus produk ini?')) return;
+    try {
+      await axios.delete(`/api/products/${id}`);
+    } catch (e) {}
+
+    const filtered = products.filter((p) => p._id !== id);
+    setProducts(filtered);
+    try {
+      localStorage.setItem('clover_custom_products', JSON.stringify(filtered));
+    } catch (e) {}
+    setNotification('Produk berhasil dihapus!');
+    setTimeout(() => setNotification(''), 3000);
+  };
+
+  const handleClearAllTestProducts = async () => {
+    if (!window.confirm('Hapus semua produk uji coba dari katalog?')) return;
+    for (const p of products) {
+      try {
+        await axios.delete(`/api/products/${p._id}`);
+      } catch (e) {}
+    }
+    setProducts([]);
+    try {
+      localStorage.removeItem('clover_custom_products');
+    } catch (e) {}
+    setNotification('Semua produk uji coba telah dihapus!');
+    setTimeout(() => setNotification(''), 3000);
   };
 
   return (
@@ -265,14 +380,43 @@ const Products = () => {
       ) : (
         /* List Mode: Daftar Katalog Produk */
         <div className="content-card">
-          <div className="admin-card-header">
+          <div className="admin-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
             <h3>Daftar Produk ({products.length})</h3>
-            <button
-              className="btn-add-primary"
-              onClick={() => setViewMode('form')}
-            >
-              + Tambah Barang Baru
-            </button>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              {products.length > 0 && (
+                <button
+                  type="button"
+                  className="btn-action-outline-sm"
+                  style={{ color: '#ef4444', borderColor: '#fca5a5' }}
+                  onClick={handleClearAllTestProducts}
+                  title="Hapus semua produk uji coba"
+                >
+                  🗑 Bersihkan Semua
+                </button>
+              )}
+              <button
+                className="btn-add-primary"
+                onClick={() => {
+                  setEditingId(null);
+                  setFormData({
+                    name: '',
+                    category: 'Hoodie',
+                    price: '',
+                    stock: '',
+                    description: '',
+                    isActive: true,
+                    imageName: '',
+                    imageSize: '',
+                    imagePreview: null,
+                    image: '',
+                    file: null,
+                  });
+                  setViewMode('form');
+                }}
+              >
+                + Tambah Barang Baru
+              </button>
+            </div>
           </div>
 
           <div className="table-responsive">
@@ -288,56 +432,77 @@ const Products = () => {
                 </tr>
               </thead>
               <tbody>
-                {products.map((p) => (
-                  <tr key={p._id}>
-                    <td>
-                      <div className="customer-avatar-name-cell">
-                        <div className="product-table-thumb">
-                          {p.image ? (
-                            <img src={p.image} alt={p.name} />
-                          ) : (
-                            <span>🧥</span>
-                          )}
-                        </div>
-                        <div>
-                          <div className="fw-semibold">{p.name}</div>
-                          <div className="text-muted" style={{ fontSize: '12px' }}>{p.description?.substring(0, 40)}...</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td><span className="category-tag-pill">{p.category}</span></td>
-                    <td className="fw-bold text-green">{formatPrice(p.price)}</td>
-                    <td>{p.stock} pcs</td>
-                    <td>
-                      <span className={p.isActive ? 'status-pill-aktif' : 'status-badge status-dibatalkan'}>
-                        {p.isActive ? 'Aktif •' : 'Nonaktif'}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="customer-action-buttons">
-                        <button
-                          className="btn-action-outline-sm"
-                          onClick={() => {
-                            setFormData({
-                              name: p.name,
-                              category: p.category,
-                              price: String(p.price),
-                              stock: String(p.stock),
-                              description: p.description || '',
-                              isActive: p.isActive !== false,
-                              imageName: p.imageName || 'preview.jpg',
-                              imageSize: p.imageSize || '1.2MB',
-                              imagePreview: p.image || null,
-                            });
-                            setViewMode('form');
-                          }}
-                        >
-                          ✏ Edit
-                        </button>
-                      </div>
+                {products.length === 0 ? (
+                  <tr>
+                    <td colSpan="6" style={{ textAlign: 'center', padding: '2rem', color: '#64748b' }}>
+                      Belum ada produk. Klik tombol <strong>+ Tambah Barang Baru</strong> untuk menambahkan produk.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  products.map((p) => {
+                    const imgSrc = getProductImage(p.image);
+                    return (
+                      <tr key={p._id}>
+                        <td>
+                          <div className="customer-avatar-name-cell">
+                            <div className="product-table-thumb" style={{ width: '44px', height: '44px', borderRadius: '8px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f1f5f9' }}>
+                              {imgSrc ? (
+                                <img src={imgSrc} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                              ) : (
+                                <span style={{ fontSize: '20px' }}>🧥</span>
+                              )}
+                            </div>
+                            <div>
+                              <div className="fw-semibold">{p.name}</div>
+                              <div className="text-muted" style={{ fontSize: '12px' }}>{p.description?.substring(0, 40)}...</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td><span className="category-tag-pill">{p.category}</span></td>
+                        <td className="fw-bold text-green">{formatPrice(p.price)}</td>
+                        <td>{p.stock} pcs</td>
+                        <td>
+                          <span className={p.isActive ? 'status-pill-aktif' : 'status-badge status-dibatalkan'}>
+                            {p.isActive ? 'Aktif •' : 'Nonaktif'}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="customer-action-buttons">
+                            <button
+                              className="btn-action-outline-sm"
+                              onClick={() => {
+                                setEditingId(p._id);
+                                setFormData({
+                                  name: p.name,
+                                  category: p.category || 'Hoodie',
+                                  price: String(p.price || ''),
+                                  stock: String(p.stock || ''),
+                                  description: p.description || '',
+                                  isActive: p.isActive !== false,
+                                  imageName: p.imageName || 'gambar-produk.jpg',
+                                  imageSize: p.imageSize || '1.0MB',
+                                  imagePreview: imgSrc,
+                                  image: p.image || '',
+                                  file: null,
+                                });
+                                setViewMode('form');
+                              }}
+                            >
+                              ✏ Edit
+                            </button>
+                            <button
+                              className="btn-action-outline-sm"
+                              style={{ color: '#ef4444', borderColor: '#fca5a5' }}
+                              onClick={() => handleDeleteProduct(p._id)}
+                            >
+                              🗑 Hapus
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
               </tbody>
             </table>
           </div>
