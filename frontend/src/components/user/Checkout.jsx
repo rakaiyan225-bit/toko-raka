@@ -54,14 +54,16 @@ const Checkout = () => {
     if (saved.length > 0) {
       setItems(saved);
     }
+    const savedInfo = JSON.parse(localStorage.getItem('clover_user_info') || '{}');
+    if (savedInfo.name) setCustomerName(savedInfo.name);
+    if (savedInfo.phone) setCustomerPhone(savedInfo.phone);
+    if (savedInfo.address) setCustomerAddress(savedInfo.address);
+
     const loggedIn = JSON.parse(localStorage.getItem('user') || 'null');
     if (loggedIn) {
       setCurrentUser(loggedIn);
       if (loggedIn.name) setCustomerName(loggedIn.name);
       if (loggedIn.phone && loggedIn.phone !== '-') setCustomerPhone(loggedIn.phone);
-    } else {
-      // Buka modal login jika belum login
-      setIsAuthOpen(true);
     }
   }, []);
 
@@ -87,13 +89,6 @@ const Checkout = () => {
   };
 
   const handleWhatsAppClick = async () => {
-    const loggedInUser = currentUser || JSON.parse(localStorage.getItem('user') || 'null');
-    if (!loggedInUser) {
-      alert('🔒 Anda harus login atau daftar akun terlebih dahulu sebelum dapat menyelesaikan checkout!');
-      setIsAuthOpen(true);
-      return;
-    }
-
     if (!customerName.trim()) {
       alert('Silakan isi Nama Lengkap Penerima terlebih dahulu!');
       return;

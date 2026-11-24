@@ -667,17 +667,57 @@
 
 .detail-actions {
   display: flex;
-  gap: 16px;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .detail-actions .btn-lg {
-  flex: 1;
+  width: 100%;
   padding: 14px;
   font-size: 15px;
   font-weight: 700;
   border-radius: 10px;
   cursor: pointer;
   border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* WhatsApp Button */
+.btn-whatsapp {
+  background: #25d366;
+  color: #ffffff !important;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 20px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+  width: 100%;
+}
+
+.btn-whatsapp:hover {
+  background: #1ebe59;
+}
+
+.btn-outline {
+  background: #ffffff;
+  border: 2px solid #0f3d26;
+  color: #0f3d26;
+  border-radius: 10px;
+  padding: 14px 20px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+  width: 100%;
+}
+
+.btn-outline:hover {
+  background: #f0fdf4;
 }
 
 /* === CART PAGE === */
@@ -811,7 +851,44 @@
 .btn-block {
   width: 100%;
   padding: 14px;
-  margin-top: 16px;
+  margin-top: 12px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-primary.btn-block {
+  background: #0f3d26;
+  color: #ffffff;
+}
+
+.btn-primary.btn-block:hover {
+  background: #175e3a;
+}
+
+.btn-whatsapp.btn-block {
+  background: #25d366;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-whatsapp.btn-block:hover {
+  background: #1ebe59;
+}
+
+.btn-outline.btn-block {
+  background: #ffffff;
+  border: 2px solid #0f3d26;
+  color: #0f3d26;
+}
+
+.btn-outline.btn-block:hover {
+  background: #f0fdf4;
 }
 
 .cart-empty {

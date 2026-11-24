@@ -5,9 +5,6 @@ const menuItems = [
   { icon: '⊞', label: 'Dashboard', path: '/admin' },
   { icon: '📦', label: 'Produk', path: '/admin/produk' },
   { icon: '📋', label: 'Pesanan', path: '/admin/pesanan' },
-  { icon: '👤', label: 'Pelanggan', path: '/admin/pelanggan' },
-  { icon: '🏷', label: 'Promo', path: '/admin/promo' },
-  { icon: '📊', label: 'Laporan', path: '/admin/laporan' },
 ];
 
 const Sidebar = ({ onNavigate }) => {

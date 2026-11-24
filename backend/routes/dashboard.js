@@ -13,6 +13,10 @@ router.get('/stats', async (req, res) => {
       const totalOrders = await Order.countDocuments();
       const totalCustomers = await Customer.countDocuments();
 
+      const diprosesCount = await Order.countDocuments({ status: 'Diproses' });
+      const dikirimCount = await Order.countDocuments({ status: 'Dikirim' });
+      const selesaiCount = await Order.countDocuments({ status: 'Selesai' });
+
       const salesAgg = await Order.aggregate([
         { $match: { status: { $ne: 'Dibatalkan' } } },
         { $group: { _id: null, totalSales: { $sum: '$totalAmount' } } },
@@ -26,6 +30,11 @@ router.get('/stats', async (req, res) => {
           totalOrders,
           totalProducts,
           totalCustomers,
+          orderCounts: {
+            diproses: diprosesCount,
+            dikirim: dikirimCount,
+            selesai: selesaiCount,
+          },
         },
       });
     }

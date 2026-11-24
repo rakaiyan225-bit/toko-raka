@@ -1,4 +1,10 @@
 const mongoose = require('mongoose');
+const dns = require('dns');
+
+// Gunakan Google DNS & Cloudflare DNS untuk resolve mongodb+srv SRV record
+try {
+  dns.setServers(['8.8.8.8', '8.8.4.4', '1.1.1.1']);
+} catch (e) {}
 
 const connectDB = async () => {
   try {

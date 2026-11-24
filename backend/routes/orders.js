@@ -91,7 +91,7 @@ router.post('/', async (req, res) => {
     const randomNum = Math.floor(10000 + Math.random() * 90000);
     const newOrder = {
       _id: 'ord_' + Date.now(),
-      orderId: '#CLD' + randomNum,
+      orderId: req.body.orderId || ('#CLD' + randomNum),
       ...req.body,
       status: req.body.status || 'Diproses',
       createdAt: new Date(),

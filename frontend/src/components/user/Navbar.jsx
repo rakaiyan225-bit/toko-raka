@@ -1,17 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import AuthModal from './AuthModal';
 
 const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [isAuthOpen, setIsAuthOpen] = useState(false);
-  const [currentUser, setCurrentUser] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem('user') || 'null');
-    } catch {
-      return null;
-    }
-  });
   const navigate = useNavigate();
 
   const getCartCount = () => {
@@ -53,7 +44,7 @@ const Navbar = () => {
         <form className="navbar-search" onSubmit={handleSearch}>
           <input
             type="text"
-            placeholder="Cari produk, brand, atau kategori... (ketik /admin untuk panel admin)"
+            placeholder="Cari produk, brand, atau kategori..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="search-input"
@@ -71,29 +62,8 @@ const Navbar = () => {
               <span className="cart-badge">{getCartCount()}</span>
             )}
           </Link>
-
-          <button
-            type="button"
-            className="nav-action-link nav-user-btn"
-            onClick={() => setIsAuthOpen(true)}
-            title={currentUser ? `Akun: ${currentUser.name}` : 'Login / Masuk Akun Pengguna'}
-            style={{ background: 'none', border: 'none', cursor: 'pointer' }}
-          >
-            <span className="nav-icon">👤</span>
-            <span className="nav-label">
-              {currentUser ? currentUser.name.split(' ')[0] : 'Saya'}
-            </span>
-          </button>
         </div>
       </div>
-
-      {/* User Login & Profile Modal */}
-      <AuthModal
-        isOpen={isAuthOpen}
-        onClose={() => setIsAuthOpen(false)}
-        user={currentUser}
-        onAuthChange={setCurrentUser}
-      />
     </nav>
   );
 };

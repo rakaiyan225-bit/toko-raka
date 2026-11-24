@@ -27,64 +27,98 @@ const chartPoints = [
   { month: 'Sep', value: 0 },
 ];
 
+const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep'];
+
 const Dashboard = () => {
   const [stats, setStats] = useState(defaultStats);
   const [recentOrders, setRecentOrders] = useState(defaultRecentOrders);
+  const [orderCounts, setOrderCounts] = useState({ diproses: 0, dikirim: 0, selesai: 0 });
+  const [monthlySalesData, setMonthlySalesData] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0]);
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchDashboardData = async () => {
+      let remoteOrders = [];
       try {
         const statsRes = await axios.get('/api/dashboard/stats');
         if (statsRes.data && statsRes.data.success && statsRes.data.data) {
           setStats(statsRes.data.data);
-        }
-      } catch (e) {
-        // Fallback to defaultStats
-      }
-
-      try {
-        const ordersRes = await axios.get('/api/dashboard/recent-orders');
-        if (ordersRes.data && ordersRes.data.success && Array.isArray(ordersRes.data.data) && ordersRes.data.data.length > 0) {
-          const mapped = ordersRes.data.data.map(o => ({
-            orderId: o.orderId,
-            customerName: o.customer?.name || 'Pelanggan',
-            productName: o.items?.[0]?.product?.name || o.items?.[0]?.name || 'Produk Clover',
-            total: o.totalAmount,
-            status: o.status,
-          }));
-          setRecentOrders(mapped);
-        }
-      } catch (e) {
-        // Fallback to defaultRecentOrders
-      }
-
-      // Sync dari local cache
-      try {
-        const localOrders = JSON.parse(localStorage.getItem('clover_custom_orders') || '[]');
-        const localProducts = JSON.parse(localStorage.getItem('clover_custom_products') || '[]');
-        const localCusts = JSON.parse(localStorage.getItem('clover_custom_customers') || '[]');
-
-        if (localOrders.length > 0) {
-          const totalSales = localOrders.reduce((sum, o) => sum + (o.totalAmount || 0), 0);
-          setStats({
-            totalSales,
-            totalOrders: localOrders.length,
-            totalProducts: localProducts.length,
-            totalCustomers: localCusts.length,
-          });
-
-          const mappedLocal = localOrders.slice(0, 5).map((o) => ({
-            orderId: o.orderId,
-            customerName: o.customer?.name || 'Pelanggan',
-            productName: o.items?.[0]?.name || o.items?.[0]?.product?.name || 'Produk Clover',
-            total: o.totalAmount,
-            status: o.status,
-          }));
-          setRecentOrders(mappedLocal);
+          if (statsRes.data.data.orderCounts) {
+            setOrderCounts(statsRes.data.data.orderCounts);
+          }
         }
       } catch (e) {}
+
+      try {
+        const ordersRes = await axios.get('/api/orders');
+        if (ordersRes.data && ordersRes.data.success && Array.isArray(ordersRes.data.data)) {
+          remoteOrders = ordersRes.data.data;
+        }
+      } catch (e) {}
+
+      let localOrders = [];
+      try {
+        localOrders = JSON.parse(localStorage.getItem('clover_custom_orders') || '[]');
+      } catch (e) {}
+
+      let localProducts = [];
+      try {
+        localProducts = JSON.parse(localStorage.getItem('clover_custom_products') || '[]');
+      } catch (e) {}
+
+      let localCusts = [];
+      try {
+        localCusts = JSON.parse(localStorage.getItem('clover_custom_customers') || '[]');
+      } catch (e) {}
+
+      // Gabungkan orders unik
+      const orderMap = new Map();
+      remoteOrders.forEach((o) => orderMap.set(o.orderId || o._id, o));
+      localOrders.forEach((o) => {
+        const key = o.orderId || o._id;
+        if (!orderMap.has(key)) orderMap.set(key, o);
+      });
+      const allOrders = Array.from(orderMap.values());
+
+      // Hitung order status counts
+      const diproses = allOrders.filter((o) => !o.status || o.status === 'Diproses').length;
+      const dikirim = allOrders.filter((o) => o.status === 'Dikirim').length;
+      const selesai = allOrders.filter((o) => o.status === 'Selesai').length;
+      setOrderCounts({ diproses, dikirim, selesai });
+
+      // Hitung total sales & stats
+      const totalSales = allOrders.reduce((sum, o) => sum + (o.totalAmount || 0), 0);
+      setStats({
+        totalSales,
+        totalOrders: allOrders.length,
+        totalProducts: localProducts.length,
+        totalCustomers: localCusts.length,
+        orderCounts: { diproses, dikirim, selesai },
+      });
+
+      // Hitung penjualan per bulan (Jan - Sep)
+      const monthly = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+      allOrders.forEach((o) => {
+        if (o.status !== 'Dibatalkan') {
+          const d = new Date(o.createdAt || Date.now());
+          const m = d.getMonth();
+          if (m >= 0 && m < 9) {
+            monthly[m] += o.totalAmount || 0;
+          }
+        }
+      });
+      setMonthlySalesData(monthly);
+
+      // Recent orders mapping
+      const mapped = allOrders.slice(0, 5).map((o) => ({
+        orderId: o.orderId,
+        customerName: o.customer?.name || 'Pelanggan',
+        productName: o.items?.[0]?.name || o.items?.[0]?.product?.name || 'Produk Clover',
+        total: o.totalAmount || 0,
+        status: o.status || 'Diproses',
+      }));
+      setRecentOrders(mapped);
     };
 
     fetchDashboardData();
@@ -102,6 +136,29 @@ const Dashboard = () => {
         return <span className="status-badge status-dibatalkan">{status}</span>;
     }
   };
+
+  const maxSale = Math.max(...monthlySalesData, 0);
+  const chartPoints = monthNames.map((m, idx) => {
+    const val = monthlySalesData[idx] || 0;
+    const x = 45 + idx * 58;
+    const y = maxSale > 0 ? 140 - (val / maxSale) * 105 : 140;
+    return { month: m, value: val, x, y };
+  });
+
+  const getSmoothSvgPath = (pts) => {
+    if (!pts || pts.length === 0) return '';
+    let d = `M ${pts[0].x} ${pts[0].y}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[i];
+      const p1 = pts[i + 1];
+      const mx = (p0.x + p1.x) / 2;
+      d += ` C ${mx} ${p0.y}, ${mx} ${p1.y}, ${p1.x} ${p1.y}`;
+    }
+    return d;
+  };
+
+  const linePath = getSmoothSvgPath(chartPoints);
+  const areaPath = chartPoints.length > 0 ? `${linePath} L ${chartPoints[chartPoints.length - 1].x} 150 L ${chartPoints[0].x} 150 Z` : '';
 
   return (
     <div className="admin-page dashboard-page">
@@ -190,7 +247,11 @@ const Dashboard = () => {
           <div className="card-header-simple">
             <div>
               <h3 className="card-title">Grafik Penjualan</h3>
-              <p className="card-subtitle-green">Belum ada data penjualan</p>
+              <p className="card-subtitle-green">
+                {stats.totalSales > 0
+                  ? `Total Penjualan: ${formatPrice(stats.totalSales)} • ${stats.totalOrders} Pesanan`
+                  : 'Belum ada data penjualan'}
+              </p>
             </div>
           </div>
 
@@ -204,37 +265,28 @@ const Dashboard = () => {
               </defs>
 
               {/* Grid lines */}
-              <line x1="30" y1="30" x2="520" y2="30" stroke="#f0f2f5" strokeWidth="1" />
+              <line x1="30" y1="35" x2="520" y2="35" stroke="#f0f2f5" strokeWidth="1" />
               <line x1="30" y1="75" x2="520" y2="75" stroke="#f0f2f5" strokeWidth="1" />
-              <line x1="30" y1="120" x2="520" y2="120" stroke="#f0f2f5" strokeWidth="1" />
+              <line x1="30" y1="115" x2="520" y2="115" stroke="#f0f2f5" strokeWidth="1" />
 
               {/* Gradient Area under curve */}
-              <path
-                d="M 45 130 Q 95 105 105 105 T 165 110 T 225 80 T 285 95 T 345 65 T 405 85 T 465 55 T 510 30 L 510 150 L 45 150 Z"
-                fill="url(#chartGradient)"
-              />
+              {areaPath && (
+                <path d={areaPath} fill="url(#chartGradient)" />
+              )}
 
               {/* Line path */}
-              <path
-                d="M 45 130 Q 95 105 105 105 T 165 110 T 225 80 T 285 95 T 345 65 T 405 85 T 465 55 T 510 30"
-                fill="none"
-                stroke="#15803d"
-                strokeWidth="3"
-                strokeLinecap="round"
-              />
+              {linePath && (
+                <path
+                  d={linePath}
+                  fill="none"
+                  stroke="#15803d"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                />
+              )}
 
               {/* Data points */}
-              {[
-                { x: 45, y: 130 },
-                { x: 105, y: 105 },
-                { x: 165, y: 110 },
-                { x: 225, y: 80 },
-                { x: 285, y: 95 },
-                { x: 345, y: 65 },
-                { x: 405, y: 85 },
-                { x: 465, y: 55 },
-                { x: 510, y: 30 },
-              ].map((pt, idx) => (
+              {chartPoints.map((pt, idx) => (
                 <circle
                   key={idx}
                   cx={pt.x}
@@ -243,7 +295,9 @@ const Dashboard = () => {
                   fill="#ffffff"
                   stroke="#15803d"
                   strokeWidth="2.5"
-                />
+                >
+                  <title>{pt.month}: {formatPrice(pt.value)}</title>
+                </circle>
               ))}
             </svg>
 
@@ -261,16 +315,16 @@ const Dashboard = () => {
           <h3 className="card-title">Ringkasan</h3>
           <div className="summary-badges-list">
             <div className="summary-badge-item">
-              <span className="summary-tag badge-orange">Selesai</span>
-              <span className="summary-text">Pesanan Diproses: <strong>0</strong></span>
+              <span className="summary-tag badge-orange">Diproses</span>
+              <span className="summary-text">Pesanan Diproses: <strong>{orderCounts.diproses}</strong></span>
             </div>
             <div className="summary-badge-item">
-              <span className="summary-tag badge-blue">Pesanan</span>
-              <span className="summary-text">Pesanan Dikirim: <strong>0</strong></span>
+              <span className="summary-tag badge-blue">Dikirim</span>
+              <span className="summary-text">Pesanan Dikirim: <strong>{orderCounts.dikirim}</strong></span>
             </div>
             <div className="summary-badge-item">
-              <span className="summary-tag badge-green">Dikirim</span>
-              <span className="summary-text">Pesanan Selesai: <strong>0</strong></span>
+              <span className="summary-tag badge-green">Selesai</span>
+              <span className="summary-text">Pesanan Selesai: <strong>{orderCounts.selesai}</strong></span>
             </div>
           </div>
         </div>

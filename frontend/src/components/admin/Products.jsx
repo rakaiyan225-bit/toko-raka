@@ -167,6 +167,26 @@ const Products = () => {
     setViewMode('list');
   };
 
+  const handleToggleActive = async (product) => {
+    const newActive = product.isActive === false ? true : false;
+    const updatedProduct = { ...product, isActive: newActive };
+
+    try {
+      await axios.put(`/api/products/${product._id}`, { isActive: newActive });
+    } catch (e) {}
+
+    const updated = products.map((p) => (p._id === product._id ? updatedProduct : p));
+    setProducts(updated);
+    try {
+      localStorage.setItem('clover_custom_products', JSON.stringify(updated));
+    } catch (e) {}
+
+    setNotification(
+      `Status "${product.name}": ${newActive ? 'Aktif (Tampil di halaman user)' : 'Nonaktif (Disembunyikan dari halaman user)'}`
+    );
+    setTimeout(() => setNotification(''), 3500);
+  };
+
   const handleDeleteProduct = async (id) => {
     if (!window.confirm('Yakin ingin menghapus produk ini?')) return;
     try {
@@ -462,9 +482,15 @@ const Products = () => {
                         <td className="fw-bold text-green">{formatPrice(p.price)}</td>
                         <td>{p.stock} pcs</td>
                         <td>
-                          <span className={p.isActive ? 'status-pill-aktif' : 'status-badge status-dibatalkan'}>
-                            {p.isActive ? 'Aktif •' : 'Nonaktif'}
-                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleToggleActive(p)}
+                            className={p.isActive !== false ? 'status-pill-aktif' : 'status-badge status-dibatalkan'}
+                            style={{ cursor: 'pointer', border: 'none', font: 'inherit' }}
+                            title={`Klik untuk ${p.isActive !== false ? 'Nonaktifkan (sembunyikan dari user)' : 'Aktifkan (tampilkan ke user)'}`}
+                          >
+                            {p.isActive !== false ? 'Aktif •' : 'Nonaktif'}
+                          </button>
                         </td>
                         <td>
                           <div className="customer-action-buttons">

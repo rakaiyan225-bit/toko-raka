@@ -74,7 +74,9 @@ const Orders = () => {
     const matchSearch =
       order.orderId?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       order.customer?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.items?.[0]?.product?.name?.toLowerCase().includes(searchQuery.toLowerCase());
+      order.customer?.phone?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      order.items?.[0]?.product?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      order.items?.[0]?.name?.toLowerCase().includes(searchQuery.toLowerCase());
     return matchFilter && matchSearch;
   });
 

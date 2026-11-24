@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import AuthModal from './AuthModal';
+import ToastContainer, { showToast } from './Toast';
 
 const hardcodedProducts = [];
 
@@ -88,7 +89,7 @@ const Home = () => {
       });
     }
     localStorage.setItem('cart', JSON.stringify(cart));
-    alert(`${product.name} berhasil ditambahkan ke keranjang! 🛒`);
+    showToast(`${product.name} ditambahkan ke keranjang!`, 'success');
   };
 
   const buyNow = (product) => {
@@ -106,7 +107,7 @@ const Home = () => {
 
     const user = JSON.parse(localStorage.getItem('user') || 'null');
     if (!user) {
-      alert('🔒 Silakan login atau daftar akun terlebih dahulu untuk melanjutkan pembelian!');
+      showToast('Silakan login terlebih dahulu untuk melanjutkan pembelian', 'warning');
       setIsAuthOpen(true);
       return;
     }
@@ -115,6 +116,8 @@ const Home = () => {
 
   const searchQuery = searchParams.get('search') || '';
   const filteredProducts = products.filter((p) => {
+    // Jika admin menonaktifkan produk, jangan tampilkan di halaman user
+    if (p.isActive === false) return false;
     const matchCat = !activeCategory || p.category === activeCategory;
     const matchSearch = !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase());
     return matchCat && matchSearch;
@@ -222,13 +225,6 @@ const Home = () => {
                     >
                       Tambah Keranjang
                     </button>
-                    <button
-                      type="button"
-                      className="btn btn-primary"
-                      onClick={() => buyNow(product)}
-                    >
-                      Beli Sekarang
-                    </button>
                   </div>
                 </div>
               </div>
@@ -249,6 +245,7 @@ const Home = () => {
           }
         }}
       />
+      <ToastContainer />
     </div>
   );
 };

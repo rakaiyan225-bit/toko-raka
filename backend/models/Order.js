@@ -41,11 +41,11 @@ const orderSchema = new mongoose.Schema({
   },
   shippingCost: {
     type: Number,
-    default: 15000,
+    default: 0,
   },
   paymentMethod: {
     type: String,
-    enum: ['DANA', 'OVO', 'GoPay', 'ShopeePay', 'Transfer Bank', 'COD'],
+    default: 'WhatsApp',
   },
   status: {
     type: String,
