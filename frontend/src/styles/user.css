@@ -297,7 +297,8 @@
   padding: 14px 18px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
   z-index: 2;
-  min-width: 440px;
+  flex: 1;
+  max-width: 480px;
 }
 
 .kategori-card-heading {
@@ -309,8 +310,8 @@
 
 .kategori-boxes-row {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(54px, 1fr));
+  gap: 6px;
 }
 
 .kategori-box-btn {
@@ -1375,27 +1376,31 @@
    COMPREHENSIVE RESPONSIVE DESIGN SYSTEM
    ===================================================== */
 
-/* Tablet (max-width: 1024px) */
-@media (max-width: 1024px) {
+/* Tablet & Medium Laptops (max-width: 1080px) */
+@media (max-width: 1080px) {
   .navbar-container {
     padding: 12px 20px;
     gap: 16px;
   }
 
   .navbar-search {
-    max-width: 440px;
+    max-width: 400px;
   }
 
   .user-promo-banner {
-    padding: 30px 28px 26px 28px;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 34px 24px 24px 24px;
     gap: 20px;
   }
 
   .banner-kategori-card {
-    min-width: 380px;
+    max-width: 100%;
+    width: 100%;
   }
 
   .product-grid {
+    grid-template-columns: repeat(3, 1fr);
     gap: 16px;
   }
 }
@@ -1599,6 +1604,41 @@
   .cart-container {
     grid-template-columns: 1fr;
     gap: 20px;
+  }
+
+  .cart-item {
+    display: grid;
+    grid-template-columns: 75px 1fr;
+    grid-template-areas:
+      "img info"
+      "qty total";
+    gap: 10px 14px;
+    padding: 12px;
+  }
+
+  .cart-item-image {
+    grid-area: img;
+    width: 75px;
+    height: 75px;
+  }
+
+  .cart-item-info {
+    grid-area: info;
+  }
+
+  .cart-item-quantity {
+    grid-area: qty;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .cart-item-total {
+    grid-area: total;
+    text-align: right;
+    align-self: center;
+    font-size: 15px;
+    font-weight: 800;
   }
 
   /* Footer */

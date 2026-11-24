@@ -256,9 +256,12 @@ const modalStyles = {
     borderRadius: '16px',
     maxWidth: '480px',
     width: '100%',
+    maxHeight: '92vh',
+    overflowY: 'auto',
     padding: '24px',
     boxShadow: '0 20px 40px rgba(0, 0, 0, 0.25)',
     animation: 'modalSlideUp 0.25s ease',
+    boxSizing: 'border-box',
   },
   header: {
     display: 'flex',
